@@ -1,0 +1,118 @@
+name: car-board-build
+
+# 車種別AI分析ボードの再ビルド。
+# 計測そのものは toyota-geo-board の car-round が担当し、ここは表示を作り直すだけ。
+# 07:35 JST（= 22:35 UTC 前日）。geo-board の日次(07:17)が終わった後に回す。
+on:
+  schedule:
+    - cron: "35 22 * * *"
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "tools/**"
+      - ".github/workflows/**"
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: car-board
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 鍵の有無を確認
+        id: keys
+        env:
+          W: ${{ secrets.WINDSOR_API_KEY }}
+          G: ${{ secrets.CAR_GATE_KEY }}
+        run: |
+          if [ -z "$W" ] || [ -z "$G" ]; then
+            echo "シークレット未登録のためスキップします（既存ページはそのまま）"
+            echo "ok=false" >> $GITHUB_OUTPUT
+          else
+            echo "ok=true" >> $GITHUB_OUTPUT
+          fi
+
+      - uses: actions/setup-python@v5
+        if: steps.keys.outputs.ok == 'true'
+        with:
+          python-version: "3.12"
+
+      - name: Python依存
+        if: steps.keys.outputs.ok == 'true'
+        run: pip install pyyaml cryptography
+
+      - uses: actions/setup-node@v4
+        if: steps.keys.outputs.ok == 'true'
+        with:
+          node-version: "20"
+
+      - name: Playwright
+        if: steps.keys.outputs.ok == 'true'
+        run: |
+          npm i -D playwright
+          npx playwright install --with-deps chromium
+
+      - name: 計測データを取得（geo-board）
+        if: steps.keys.outputs.ok == 'true'
+        run: |
+          git clone --depth 3 https://github.com/ketrketr2/toyota-geo-board /tmp/gb
+          ls /tmp/gb/data/car/snapshots/ | tail -3
+
+      - name: GA4・トレンド・統合・ビルド・検証
+        if: steps.keys.outputs.ok == 'true'
+        env:
+          WINDSOR_API_KEY: ${{ secrets.WINDSOR_API_KEY }}
+          GEO_REPO: /tmp/gb
+          PW_CHROME: ""
+        run: |
+          set -e
+          python3 tools/pull_ga_trend.py
+          python3 tools/aggregate_board.py
+          python3 tools/build.py
+          node tools/verify.js
+
+      - name: 暗号化してページを更新
+        if: steps.keys.outputs.ok == 'true'
+        env:
+          CAR_GATE_KEY: ${{ secrets.CAR_GATE_KEY }}
+        run: |
+          set -e
+          python3 tools/encrypt.py
+          # 復号ラウンドトリップを確認してから差し替える
+          node tools/verify_gate.js
+          mv index_new.html docs/index.html
+          rm -f plain.html
+
+      - name: コミット
+        if: steps.keys.outputs.ok == 'true'
+        run: |
+          git config user.name  "car-board-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add docs/index.html
+          git diff --staged --quiet || git commit -m "chore: ボード更新 $(date -u +%Y-%m-%d)"
+          git pull --rebase -q || true
+          git push
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
