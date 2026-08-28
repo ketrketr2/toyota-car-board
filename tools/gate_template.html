@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>車種別AI分析 — 認証</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&family=JetBrains+Mono:wght@600;800&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='24' fill='%23FFB020'/><path d='M20 62 L30 40 Q33 33 41 33 L59 33 Q67 33 70 40 L80 62 Z' fill='%23140F04'/><rect x='16' y='58' width='68' height='14' rx='7' fill='%23140F04'/><circle cx='34' cy='74' r='8' fill='%23140F04' stroke='%23FFB020' stroke-width='4'/><circle cx='66' cy='74' r='8' fill='%23140F04' stroke='%23FFB020' stroke-width='4'/></svg>">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{overflow-x:hidden;max-width:100%;}
+@media(max-width:900px){input{font-size:16px!important;}}
+body{min-height:100vh;display:grid;place-items:center;padding:24px;
+ background:radial-gradient(1000px 620px at 50% -8%, #123049 0%, transparent 58%), #080D18;
+ color:#EAF1FB;font-family:'BIZ UDPGothic','BIZ UDGothic','Hiragino Sans',Meiryo,sans-serif;}
+.card{width:100%;max-width:400px;background:linear-gradient(160deg,#152037,#111A2C 65%);border:1px solid #1E2C46;border-radius:18px;
+ padding:34px 30px 28px;box-shadow:0 30px 80px rgba(2,7,16,.6);position:relative;overflow:hidden;}
+.card:before{content:"";position:absolute;left:0;right:0;top:0;height:3px;background:linear-gradient(90deg,#FFB020,transparent 75%);}
+.mk{width:52px;height:52px;border-radius:14px;display:grid;place-items:center;margin-bottom:16px;}
+.mk svg{width:32px;height:32px;}
+h1{font-size:20px;letter-spacing:.05em;} h1 span{color:#FFB020;}
+.sub{font-size:11px;color:#5F7291;letter-spacing:.16em;margin-top:3px;margin-bottom:24px;}
+label{display:block;font-size:11px;color:#9EB1CD;margin:14px 0 6px;font-weight:700;}
+input{width:100%;background:#0b1424;border:1px solid #2B3D5E;color:#EAF1FB;font-family:inherit;font-size:14px;padding:12px 14px;border-radius:10px;outline:none;transition:.15s;}
+input:focus{border-color:#FFB020;box-shadow:0 0 0 3px rgba(255,176,32,.16);}
+button{width:100%;margin-top:22px;background:linear-gradient(145deg,#FFB020,#E8920A);color:#140F04;border:none;font-family:inherit;font-weight:800;font-size:14px;letter-spacing:.05em;padding:13px;border-radius:10px;cursor:pointer;transition:.15s;}
+button:hover{filter:brightness(1.08);} button:disabled{opacity:.6;cursor:wait;}
+.err{color:#FF6B87;font-size:12px;margin-top:14px;min-height:16px;text-align:center;}
+.ft{font-size:10px;color:#5F7291;text-align:center;margin-top:20px;line-height:1.7;}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(4,18,26,.35);border-top-color:#140F04;border-radius:50%;vertical-align:-2px;margin-right:7px;animation:sp .7s linear infinite;}
+@keyframes sp{to{transform:rotate(360deg);}}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="mk" style="background:linear-gradient(145deg,#FFB020,#E8920A);box-shadow:0 8px 22px rgba(255,176,32,.4)"><svg width="30" height="30" viewBox="0 0 100 100"><path d="M20 62 L30 40 Q33 33 41 33 L59 33 Q67 33 70 40 L80 62 Z" fill="#140F04"/><rect x="16" y="58" width="68" height="14" rx="7" fill="#140F04"/><circle cx="34" cy="74" r="8" fill="#140F04" stroke="#FFB020" stroke-width="4"/><circle cx="66" cy="74" r="8" fill="#140F04" stroke="#FFB020" stroke-width="4"/></svg></div>
+  <h1>車種別<span>AI分析</span></h1>
+  <div class="sub">CAR × AI DEEP DIVE</div>
+  <form id="f" autocomplete="off">
+    <label for="u">ID</label>
+    <input id="u" type="text" autocomplete="username" spellcheck="false" autocapitalize="none">
+    <label for="p">パスワード</label>
+    <input id="p" type="password" autocomplete="current-password">
+    <button id="b" type="submit">ログイン</button>
+    <div class="err" id="e"></div>
+  </form>
+  <div class="ft">認証済みユーザー専用。データは暗号化されています。<br>不明な場合は管理者（<a href="mailto:nakai@slashslash.jp" style="color:#FFB020;text-decoration:none">nakai@slashslash.jp</a>）へお問い合わせください。</div>
+</div>
+<script>
+const BLOB="__BLOB__";
+const ITER=200000;
+function b64d(s){const bin=atob(s);const a=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)a[i]=bin.charCodeAt(i);return a;}
+async function decrypt(u,p){
+ const data=b64d(BLOB);
+ const salt=data.slice(0,16), iv=data.slice(16,28), ct=data.slice(28);
+ const enc=new TextEncoder();
+ const km=await crypto.subtle.importKey('raw',enc.encode(u+':'+p),{name:'PBKDF2'},false,['deriveKey']);
+ const key=await crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:ITER,hash:'SHA-256'},km,{name:'AES-GCM',length:256},false,['decrypt']);
+ const plain=await crypto.subtle.decrypt({name:'AES-GCM',iv},key,ct);
+ const ds=new DecompressionStream('gzip');
+ const stream=new Blob([plain]).stream().pipeThrough(ds);
+ return await new Response(stream).text();
+}
+const f=document.getElementById('f'),e=document.getElementById('e'),b=document.getElementById('b');
+f.addEventListener('submit',async ev=>{
+ ev.preventDefault();
+ const u=document.getElementById('u').value.trim(), p=document.getElementById('p').value;
+ if(!u||!p){e.textContent='IDとパスワードを入力してください';return;}
+ b.disabled=true;b.innerHTML='<span class="spin"></span>復号中…';e.textContent='';
+ try{
+   const html=await decrypt(u,p);
+   if(html.indexOf('CARAI_BOARD')===-1) throw new Error('bad');
+   document.open();document.write(html);document.close();
+ }catch(err){
+   e.textContent='IDまたはパスワードが正しくありません';
+   b.disabled=false;b.textContent='ログイン';
+ }
+});
+document.getElementById('u').focus();
+</script>
+</body>
+</html>
