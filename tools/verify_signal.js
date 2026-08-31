@@ -1,7 +1,9 @@
+const fs = require('fs');
 const { chromium } = require('playwright');
+const PW_EXE = process.env.PW_CHROME || '/opt/pw-browsers/chromium';
+const LAUNCH = fs.existsSync(PW_EXE) ? { executablePath: PW_EXE } : {};
 (async () => {
-  const exe = process.env.PW_CHROME || '/opt/pw-browsers/chromium';
-  const b = await chromium.launch(exe ? { executablePath: exe } : {});
+  const b = await chromium.launch(LAUNCH);
   const errs = [];
   for (const w of [[1440, 900], [390, 844]]) {
     const p = await b.newPage({ viewport: { width: w[0], height: w[1] } });

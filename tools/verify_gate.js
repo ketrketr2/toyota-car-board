@@ -1,6 +1,9 @@
+const fs = require('fs');
 const { chromium } = require('playwright');
+const PW_EXE = process.env.PW_CHROME || '/opt/pw-browsers/chromium';
+const LAUNCH = fs.existsSync(PW_EXE) ? { executablePath: PW_EXE } : {};
 (async () => {
-  const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
+  const b = await chromium.launch(LAUNCH);
   const p = await b.newPage({ viewport: { width: 1440, height: 900 } });
   const errs = [];
   p.on('pageerror', e => errs.push('pageerror: ' + e.message));

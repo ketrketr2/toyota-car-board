@@ -1,6 +1,9 @@
+const fs = require('fs');
 const { chromium } = require('playwright');
+const PW_EXE = process.env.PW_CHROME || '/opt/pw-browsers/chromium';
+const LAUNCH = fs.existsSync(PW_EXE) ? { executablePath: PW_EXE } : {};
 (async () => {
-  const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
+  const b = await chromium.launch(LAUNCH);
   const errs = [];
   const views = ['hq', 'car:roomy', 'car:sienta', 'car:alphard', 'car:voxy', 'car:noah',
                  'car:aqua', 'car:raize', 'car:lc250', 'queries', 'guide'];
