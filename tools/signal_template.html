@@ -1,0 +1,1255 @@
+<title>CAR×AI SIGNAL ROOM</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&family=JetBrains+Mono:wght@500;700;800&display=swap">
+<style>
+:root{
+--bg:#060709;--sf:#0B0D11;--sf2:#10131A;--hl:#1B1F27;--hl2:#2A3140;
+--tx:#F4F6FA;--mu:#A7B2C2;--fa:#6E7A8E;
+--ac:#6C9EFF;--ac2:#9DBEFF;--acdim:rgba(108,158,255,.14);
+--up:#3FD98F;--dn:#FF5C7A;--wa:#FFC24D;
+--mono:'JetBrains Mono',ui-monospace,monospace;
+--body:'BIZ UDPGothic','BIZ UDGothic','Hiragino Sans',Meiryo,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{overflow-x:hidden}
+body{background:var(--bg);color:var(--tx);font-family:var(--body);font-size:14px;line-height:1.75;-webkit-font-smoothing:antialiased}
+a{color:var(--ac)}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+::selection{background:rgba(108,158,255,.3)}
+button{font-family:var(--body);cursor:pointer;color:inherit}
+:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+mark{background:var(--acdim);color:var(--ac2);padding:0 3px;border-radius:3px}
+
+.top{position:sticky;top:0;z-index:40;background:rgba(6,7,9,.88);backdrop-filter:blur(10px);border-bottom:1px solid var(--hl)}
+.topin{max-width:1280px;margin:0 auto;padding:0 22px;height:62px;display:flex;align-items:center;gap:16px}
+.logo{display:flex;align-items:baseline;gap:9px;white-space:nowrap;cursor:pointer}
+.pass{font-size:9px;color:var(--fa);margin-left:4px;white-space:nowrap}
+.logo .dot{width:8px;height:8px;border-radius:50%;background:var(--ac);box-shadow:0 0 10px var(--ac);display:inline-block;animation:pulse 2.6s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.45}}
+.logo b{font-size:14.5px;letter-spacing:.05em}
+.logo span{font-family:var(--mono);font-size:9.5px;color:var(--fa);letter-spacing:.18em}
+@media(max-width:1540px){.meta{display:none}.logo span{display:none}}
+.meta{margin-left:auto;font-family:var(--mono);font-size:9.5px;color:var(--fa);letter-spacing:.05em;white-space:nowrap}
+.meta b{color:var(--mu);font-weight:500}
+.tabs{display:flex;gap:5px;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{background:none;border:1px solid var(--hl);border-radius:9px;color:var(--mu);font-size:12.5px;font-weight:700;padding:7px 12px;letter-spacing:.02em;transition:all .18s;white-space:nowrap}
+.tab:hover{color:var(--tx);border-color:var(--hl2)}
+.tab.on{color:var(--ac2);background:var(--acdim);border-color:rgba(108,158,255,.55);box-shadow:0 0 0 1px rgba(108,158,255,.2) inset}
+.tab .k{font-family:var(--mono);font-size:8.5px;color:var(--ac);margin-right:5px}
+
+.wrap{max-width:1280px;margin:0 auto;padding:24px 22px 90px}
+.view{display:none}
+.view.on{display:block;animation:vin .28s ease}
+@keyframes vin{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){.view.on,.logo .dot{animation:none}*{transition:none!important}}
+.grid{display:grid;gap:14px}
+.grid>*{min-width:0}
+.c2{grid-template-columns:1fr 1fr}
+.c3{grid-template-columns:repeat(3,1fr)}
+.c32{grid-template-columns:1.55fr 1fr}
+.c23{grid-template-columns:1fr 1.55fr}
+@media(max-width:900px){.c2,.c3,.c32,.c23{grid-template-columns:1fr}.topin{flex-wrap:wrap;height:auto;padding:9px 14px}.meta{display:none}}
+
+.card{background:var(--sf);border:1px solid var(--hl);border-radius:13px;padding:18px 20px;transition:border-color .18s}
+.card:hover{border-color:var(--hl2)}
+.card h3{font-size:12px;color:var(--mu);font-weight:700;letter-spacing:.08em;margin-bottom:3px}
+.card .sub{font-size:11px;color:var(--fa);margin-bottom:12px;line-height:1.6}
+.sec{margin:28px 0 12px;display:flex;align-items:baseline;gap:12px}
+.sec h2{font-size:15px;letter-spacing:.04em}
+.sec .ln{flex:1;height:1px;background:var(--hl)}
+.sec .tag{font-family:var(--mono);font-size:9px;color:var(--fa);letter-spacing:.12em;text-align:right}
+
+/* hero */
+.hero{display:grid;grid-template-columns:auto 1fr;gap:34px;align-items:end;padding:22px 0 22px}
+@media(max-width:900px){.hero{grid-template-columns:1fr;gap:16px}}
+.hero .big{font-family:var(--mono);font-size:80px;font-weight:800;line-height:.95;letter-spacing:-.02em}
+.hero .big small{font-size:28px;color:var(--mu);font-weight:700}
+.hero .cap{font-size:12px;color:var(--mu);margin-top:10px;max-width:460px}
+.hero .cap b{color:var(--tx)}
+.hstats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--hl);border:1px solid var(--hl);border-radius:12px;overflow:hidden}
+@media(max-width:900px){.hstats{grid-template-columns:repeat(2,1fr)}}
+.hs{background:var(--sf);padding:13px 15px}
+.hs .v{font-family:var(--mono);font-size:22px;font-weight:800}
+.hs .v small{font-size:10.5px;color:var(--fa);font-weight:500;margin-left:2px}
+.hs .l{font-size:10.5px;color:var(--fa);letter-spacing:.06em;margin-top:2px}
+.hs .d{font-size:9.5px;margin-top:2px;color:var(--fa)}
+
+/* hero panels */
+.heroP{display:grid;grid-template-columns:280px 280px 1fr;gap:12px;margin-top:14px}
+.heroP>*{min-width:0}
+@media(max-width:1100px){.heroP{grid-template-columns:1fr 1fr}.hpwide{grid-column:1/-1}}
+@media(max-width:700px){.heroP{grid-template-columns:1fr}}
+.hp{cursor:pointer;text-align:left;transition:all .18s}
+.hp:hover{border-color:var(--ac);transform:translateY(-2px)}
+.hpfoot{display:flex;justify-content:center;gap:16px;font-size:11.5px;color:var(--mu);margin-top:10px;flex-wrap:wrap}
+.hpfoot .num{color:var(--tx)}
+.lg{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+/* toolbar */
+.tbar{margin-left:auto;display:flex;align-items:center;gap:8px;white-space:nowrap}
+.upd{font-family:var(--mono);font-size:10px;color:var(--fa);letter-spacing:.05em}
+#gsearch{background:var(--sf2);border:1px solid var(--hl2);border-radius:8px;color:var(--tx);font-size:12px;padding:6px 11px;width:168px;font-family:var(--body)}
+#gsearch::placeholder{color:var(--fa)}
+.tbtn{width:33px;height:33px;border:1px solid var(--hl2);border-radius:8px;background:var(--sf2);color:var(--mu);font-size:14px}
+.tbtn:hover{color:var(--tx);border-color:var(--ac)}
+@media(max-width:1380px){.upd{display:none}}
+@media(max-width:1180px){#gsearch{width:110px}}
+/* light theme */
+body.light{--bg:#EEF1F6;--sf:#FFFFFF;--sf2:#F4F6FA;--hl:#DFE4EC;--hl2:#C2CBD8;--tx:#141B28;--mu:#3D4A5E;--fa:#71809A;--ac:#2E5FD0;--ac2:#234CB0;--acdim:rgba(46,95,208,.10);--up:#0C9A5F;--dn:#D22B55;--wa:#8A6200}
+body.light .top{background:rgba(255,255,255,.92)}
+body.light svg text[fill="#F4F6FA"]{fill:#141B28}
+body.light svg text[fill="#C7CFDC"]{fill:#2A3547}
+body.light svg text[fill="#EAF1FB"]{fill:#141B28}
+body.light svg text[fill="#98A2B3"]{fill:#445062}
+body.light svg [stroke="#1B1F27"]{stroke:#DFE4EC}
+body.light svg [stroke="#2A3140"]{stroke:#C2CBD8}
+body.light svg [stroke="#1E2C46"]{stroke:#D5DCE6}
+body.light svg [fill="#0D1626"],body.light svg [fill="#111A2C"],body.light svg [fill="#152037"],body.light svg [fill="#0b1424"],body.light svg [fill="#0C1424"]{fill:#F0F3F8}
+body.light .ans{color:#2A3547}
+body.light .modal,body.light .drawer{background:#FFFFFF}
+body.light .tt{background:#fff;border-color:#C2CBD8;color:#3D4A5E}
+body.light .imgw,body.light .carimgbig{background:linear-gradient(180deg,#FAFBFC,#EDF0F4)}
+/* print */
+/* ===== ホバー強化: クリッカブル要素の明示 ===== */
+.hov,.clicky,.jump,.st,.cs,.dtab,.tab,.qmark,th[data-k]{cursor:pointer}
+.fb tr.hov:hover td,.t tr.hov:hover td{background:var(--acdim)}
+.fb tr.hov:hover td:first-child,.t tr.hov:hover td:first-child{box-shadow:inset 3px 0 0 var(--ac)}
+.jump{transition:all .15s}
+tr.hov:hover .jump,.jump:hover{background:var(--acdim);border-color:var(--ac);color:var(--ac2);transform:translateY(-1px)}
+.clicky:hover{filter:none;background:var(--acdim);box-shadow:inset 0 0 0 1px var(--ac);border-radius:8px}
+.st,.cs{transition:all .15s}
+.st:hover{border-color:var(--ac);transform:translateY(-1px)}
+.cs:hover{border-color:var(--ac);color:var(--tx);transform:translateY(-1px)}
+.dtab:hover{border-color:var(--ac);color:var(--tx)}
+.tab:hover{color:var(--tx);border-color:var(--ac);background:var(--acdim)}
+.hp:hover{border-color:var(--ac);transform:translateY(-2px);box-shadow:0 10px 26px rgba(0,0,0,.30)}
+.cg:hover{border-color:var(--ac);transform:translateY(-3px);box-shadow:0 12px 30px rgba(0,0,0,.30)}
+th[data-k]:hover{color:var(--ac2)}
+.logo:hover b{color:var(--ac2)}
+@media print{
+ body{--bg:#fff;--sf:#fff;--sf2:#f6f7f9;--hl:#d8dde5;--hl2:#b9c2cf;--tx:#111621;--mu:#2E3947;--fa:#5A6678;background:#fff}
+ .top{position:static;background:#fff}
+ .tabs,.tbar,.st .ic,.al .arw,.qmark{display:none!important}
+ .card,.al,.hp{break-inside:avoid;box-shadow:none}
+ svg text[fill="#F4F6FA"]{fill:#111}svg text[fill="#C7CFDC"]{fill:#222}svg text[fill="#98A2B3"]{fill:#3a4452}
+ svg [stroke="#1B1F27"]{stroke:#d8dde5}svg [stroke="#2A3140"]{stroke:#b9c2cf}
+}
+/* status board */
+.statusbar{display:grid;gap:1px;background:var(--hl);border:1px solid var(--hl);border-radius:12px;overflow:hidden;margin:14px 0 0}
+.sb-main{grid-template-columns:repeat(4,1fr)}
+.sb-sub{grid-template-columns:repeat(5,1fr);margin-top:8px}
+.sb-sub .st{padding:8px 12px}
+.stbig{padding:14px 16px}
+.stbig .v{font-size:27px}
+.st .d2{font-size:9.5px;color:var(--fa);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media(max-width:1000px){.sb-main{grid-template-columns:repeat(2,1fr)}.sb-sub{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:1000px){.statusbar{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:640px){.statusbar{grid-template-columns:repeat(2,1fr)}}
+.st{background:var(--sf);padding:10px 13px;text-align:left;border:none;cursor:pointer;transition:background .15s;position:relative}
+.st:hover{background:var(--sf2)}
+.st{min-width:0}
+.st .v{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.st .v{font-family:var(--mono);font-size:19px;font-weight:800;line-height:1.15}
+.st .v small{font-size:10px;color:var(--fa);font-weight:500;margin-left:1px}
+.st .l{font-size:10px;color:var(--fa);letter-spacing:.05em;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.st .ic{position:absolute;top:8px;right:9px;font-size:8.5px;color:var(--fa);font-family:var(--mono)}
+.st:hover .ic{color:var(--ac)}
+/* alerts */
+.alerts{border:1px solid var(--hl);border-radius:12px;overflow:hidden;margin-top:10px}
+.al{display:grid;grid-template-columns:82px 1fr auto auto;gap:12px;align-items:center;background:var(--sf);border:none;border-bottom:1px solid var(--hl);padding:9px 14px;width:100%;text-align:left;cursor:pointer;transition:background .15s}
+.al:last-child{border-bottom:none}
+.al:hover{background:var(--sf2)}
+.al>*{min-width:0}
+.al .sev{font-family:var(--mono);font-size:8.5px;letter-spacing:.1em;padding:2px 0;text-align:center;border-radius:5px;border:1px solid}
+.sev.crit{color:var(--dn);border-color:rgba(255,92,122,.5);background:rgba(255,92,122,.07)}
+.sev.warn{color:var(--wa);border-color:rgba(255,194,77,.45);background:rgba(255,194,77,.06)}
+.sev.info{color:var(--ac2);border-color:rgba(108,158,255,.4);background:rgba(108,158,255,.06)}
+.al .msg{font-size:13px;color:var(--tx)}
+.al .msg small{color:var(--fa);font-size:10.5px;display:block}
+.al .evd{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--ac2);white-space:nowrap}
+.al .arw{color:var(--fa);font-family:var(--mono);font-size:10px}
+/* help + modal */
+.qmark{display:inline-flex;align-items:center;justify-content:center;width:17px;height:17px;border-radius:50%;border:1px solid var(--hl2);background:none;color:var(--fa);font-size:10px;font-family:var(--mono);line-height:1;vertical-align:middle;margin-left:7px;flex-shrink:0;cursor:pointer}
+.qmark:hover{color:var(--ac);border-color:var(--ac)}
+.modal-shade{position:fixed;inset:0;background:rgba(3,4,6,.65);z-index:80;display:none;align-items:flex-start;justify-content:center;padding:7vh 16px 16px;overflow-y:auto}
+.modal-shade.on{display:flex}
+.modal{background:#0B0E14;border:1px solid var(--hl2);border-radius:14px;max-width:640px;width:100%;box-shadow:0 24px 70px rgba(0,0,0,.6);animation:min .18s ease}
+@keyframes min{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.modal .mh{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--hl)}
+.modal .mh h4{font-size:13.5px;flex:1}
+.modal .mh .mx{background:var(--sf2);border:1px solid var(--hl2);border-radius:7px;color:var(--mu);width:26px;height:26px;font-size:12px}
+.modal .mh .mx:hover{color:var(--tx);border-color:var(--ac)}
+.modal .mb{padding:15px 18px 18px;font-size:12.5px;color:var(--mu);line-height:1.9}
+.modal .mb b{color:var(--tx)}
+.modal .mb .def{background:var(--sf);border:1px solid var(--hl);border-radius:10px;padding:10px 13px;margin:9px 0;font-size:12px}
+.modal .mb .def .dh{font-family:var(--mono);font-size:9px;color:var(--ac);letter-spacing:.14em;display:block;margin-bottom:3px}
+.modal .mb table{margin-top:6px}
+.jump{display:inline-block;margin-top:11px;background:var(--acdim);border:1px solid rgba(108,158,255,.4);border-radius:8px;color:var(--ac2);font-size:11.5px;padding:6px 13px}
+.jump:hover{border-color:var(--ac)}
+.clicky{cursor:pointer}
+.clicky:hover{filter:brightness(1.15)}
+/* findings */
+.finds{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media(max-width:1000px){.finds{grid-template-columns:1fr 1fr}}
+@media(max-width:700px){.finds{grid-template-columns:1fr}}
+.find{background:var(--sf);border:1px solid var(--hl);border-radius:13px;padding:16px 18px;cursor:pointer;text-align:left;transition:all .18s;display:flex;flex-direction:column;gap:8px}
+.find:hover{border-color:var(--ac);transform:translateY(-2px)}
+.find .no{font-family:var(--mono);font-size:9px;color:var(--ac);letter-spacing:.16em}
+.find h4{font-size:13.5px;line-height:1.55;color:var(--tx)}
+.find p{font-size:11px;color:var(--mu);line-height:1.7;flex:1}
+.find .go{font-size:10px;color:var(--ac);font-family:var(--mono)}
+.find .ev{font-family:var(--mono);font-size:16px;font-weight:800;color:var(--ac2)}
+.find .ev small{font-size:9.5px;color:var(--fa);font-weight:400;font-family:var(--body)}
+
+/* funnel board */
+.fb{width:100%;border-collapse:collapse;font-size:12px}
+.fb th{font-size:10px;color:var(--fa);text-align:left;padding:8px;border-bottom:1px solid var(--hl);letter-spacing:.08em;white-space:nowrap;cursor:pointer}
+.fb th:hover{color:var(--tx)}
+.fb th.on{color:var(--ac)}
+.fb td{padding:8px;border-bottom:1px solid rgba(27,31,39,.6);white-space:nowrap;vertical-align:middle}
+.fb tr.hov{cursor:pointer}
+.fb tr.hov:hover td{background:rgba(108,158,255,.05)}
+.carcell{display:flex;align-items:center;gap:10px}
+.thumb{width:64px;height:42px;border-radius:7px;background:#ECEDEF;object-fit:cover;flex-shrink:0;border:1px solid var(--hl2)}
+.mono-thumb{width:64px;height:42px;border-radius:7px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:15px;font-weight:800;border:1px solid var(--hl2)}
+.carcell .nm{font-size:12px;font-weight:700}
+.carcell .sg{font-size:9px;color:var(--fa)}
+.fcell{position:relative;min-width:86px}
+.fcell .fbar{height:5px;border-radius:3px;background:var(--hl);position:relative;overflow:visible;margin-top:3px;width:80px}
+.fcell .fbar i{position:absolute;left:0;top:0;bottom:0;border-radius:3px}
+.fcell .fbar em{position:absolute;left:50%;top:-2px;bottom:-2px;width:1px;background:var(--hl2)}
+.fcell .fv{font-family:var(--mono);font-size:11.5px;font-weight:700}
+.bneck{box-shadow:inset 0 0 0 1.5px var(--dn);border-radius:9px}
+.bpill{display:inline-block;font-family:var(--mono);font-size:9px;padding:1px 8px;border-radius:99px;border:1px solid rgba(255,92,122,.55);color:var(--dn)}
+
+/* car grid */
+.cargrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+@media(max-width:1000px){.cargrid{grid-template-columns:repeat(2,1fr)}}
+.cg{background:var(--sf);border:1px solid var(--hl);border-radius:13px;overflow:hidden;cursor:pointer;text-align:left;transition:all .18s}
+.cg:hover{border-color:var(--ac);transform:translateY(-3px)}
+.cg .imgw{background:linear-gradient(180deg,#F2F3F5,#E4E6EA);height:118px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.cg .imgw img{width:88%;height:auto;object-fit:contain;max-height:112px}
+.cg .bd{padding:11px 13px 12px}
+.cg .nm{font-size:12.5px;font-weight:700}
+.cg .sg{font-size:9px;color:var(--fa);margin-bottom:7px}
+.cg .row{display:flex;justify-content:space-between;align-items:baseline;font-size:9.5px;color:var(--fa)}
+.cg .row .num{font-size:12px;color:var(--tx);font-weight:700}
+.cg .kb{height:4px;border-radius:2px;background:var(--hl);margin-top:7px;position:relative}
+.cg .kb i{position:absolute;top:0;bottom:0;left:0;border-radius:2px}
+.cg .kb em{position:absolute;top:-2px;bottom:-2px;left:50%;width:1px;background:var(--hl2)}
+
+/* insight strip */
+.insight{border-left:2px solid var(--ac);padding:10px 14px;background:var(--sf);border-radius:0 10px 10px 0;font-size:12.5px;color:var(--mu);margin-top:12px}
+.insight b{color:var(--tx)}
+.insight .h{font-family:var(--mono);font-size:9px;color:var(--ac);letter-spacing:.16em;display:block;margin-bottom:3px}
+.warnb{border-left-color:var(--dn)}
+.warnb .h{color:var(--dn)}
+
+/* generic table */
+table.t{width:100%;border-collapse:collapse;font-size:12.5px}
+.t th{font-size:10px;color:var(--fa);text-align:left;padding:7px 8px;border-bottom:1px solid var(--hl);letter-spacing:.08em;white-space:nowrap;cursor:pointer;user-select:none}
+.t th:hover{color:var(--mu)}
+.t td{padding:7px 8px;border-bottom:1px solid rgba(27,31,39,.6);vertical-align:middle}
+.t tr:last-child td{border-bottom:none}
+.t tr.hov:hover td{background:rgba(108,158,255,.04)}
+.tw{overflow-x:auto}
+.chip{display:inline-block;font-family:var(--mono);font-size:9px;padding:1px 7px;border-radius:99px;border:1px solid var(--hl2);color:var(--mu);white-space:nowrap}
+.chip.ty{color:var(--ac2);border-color:rgba(108,158,255,.45)}
+.dotset{font-family:var(--mono);font-size:10px;letter-spacing:2px}
+.dotset b{color:var(--ac)} .dotset s{color:#2A3140;text-decoration:none}
+
+.tt{position:fixed;z-index:99;pointer-events:none;background:#12151cee;border:1px solid var(--hl2);border-radius:9px;padding:9px 12px;font-size:11px;color:var(--mu);max-width:300px;display:none;box-shadow:0 8px 30px rgba(0,0,0,.5)}
+.tt b{color:var(--tx)}.tt .num{color:var(--ac2)}
+svg text{font-family:var(--body)}
+.gline{stroke:var(--hl);stroke-dasharray:2 4;stroke-width:1}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:10px;color:var(--fa);margin-top:10px}
+.legend i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.note{font-size:11px;color:var(--fa);line-height:1.8;margin-top:10px}
+.note b{color:var(--mu)}
+
+/* car ops */
+.carhead{display:grid;grid-template-columns:290px 1fr;gap:20px;align-items:stretch;margin-bottom:14px}
+@media(max-width:900px){.carhead{grid-template-columns:1fr}}
+.carimgbig{background:linear-gradient(180deg,#F2F3F5,#E2E5EA);border-radius:13px;border:1px solid var(--hl2);display:flex;align-items:center;justify-content:center;padding:12px;min-height:170px}
+.carimgbig img{width:96%;height:auto;object-fit:contain;max-height:180px}
+.carsel{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px}
+.segrowx{display:grid;grid-template-columns:repeat(7,1fr);gap:9px;margin-bottom:16px}
+.segrowx>*{min-width:0}
+@media(max-width:1100px){.segrowx{grid-template-columns:repeat(4,1fr)}}
+@media(max-width:760px){.segrowx{grid-template-columns:repeat(2,1fr)}}
+.cs{display:flex;align-items:center;gap:7px;background:var(--sf);border:1px solid var(--hl);border-radius:10px;padding:5px 10px 5px 5px;transition:all .15s}
+.cs:hover{border-color:var(--hl2)}
+.cs.on{border-color:var(--ac);background:var(--sf2)}
+.cs img{width:40px;height:27px;object-fit:cover;border-radius:5px;background:#ECEDEF}
+.cs span{font-size:11px}
+.statchips{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 2px}
+.sc{background:var(--sf);border:1px solid var(--hl);border-radius:10px;padding:8px 13px}
+.sc .v{font-family:var(--mono);font-size:17px;font-weight:800}
+.sc .v small{font-size:9.5px;color:var(--fa);font-weight:400}
+.sc .l{font-size:9px;color:var(--fa);letter-spacing:.06em}
+.axbar{display:grid;grid-template-columns:92px 1fr 46px;gap:9px;align-items:center;margin:5.5px 0}
+.axbar .lab{font-size:10.5px;color:var(--mu);text-align:right}
+.axbar .bar{height:7px;border-radius:4px;background:var(--hl);position:relative}
+.axbar .bar i{position:absolute;left:0;top:0;bottom:0;border-radius:4px;background:var(--ac);opacity:.85}
+.axbar .val{font-family:var(--mono);font-size:10.5px;color:var(--tx)}
+
+/* drawer */
+.shade{position:fixed;inset:0;background:rgba(3,4,6,.62);z-index:60;opacity:0;pointer-events:none;transition:opacity .22s}
+.shade.on{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(690px,94vw);background:#0A0C10;border-left:1px solid var(--hl2);z-index:70;transform:translateX(102%);transition:transform .26s cubic-bezier(.2,.8,.2,1);display:flex;flex-direction:column}
+.drawer.on{transform:none}
+.dhead{padding:16px 20px 12px;border-bottom:1px solid var(--hl);position:relative}
+.dhead .q{font-size:14px;font-weight:700;line-height:1.6;padding-right:40px}
+.dhead .m{font-size:10px;color:var(--fa);margin-top:4px;font-family:var(--mono)}
+.dx{position:absolute;top:12px;right:14px;background:var(--sf2);border:1px solid var(--hl2);border-radius:8px;color:var(--mu);width:30px;height:30px;font-size:14px}
+.dx:hover{color:var(--tx);border-color:var(--ac)}
+.dtabs{display:flex;gap:6px;padding:12px 20px 0;flex-wrap:wrap}
+.dtab{background:none;border:1px solid var(--hl2);border-radius:99px;color:var(--mu);font-family:var(--mono);font-size:10.5px;padding:5px 13px;transition:all .15s}
+.dtab.on{background:var(--ac);border-color:var(--ac);color:#0a0c10;font-weight:700}
+.dbody{flex:1;overflow-y:auto;padding:14px 20px 30px}
+.order{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.oc{font-size:10.5px;padding:3px 10px;border-radius:99px;border:1px solid var(--hl2);color:var(--mu)}
+.oc.own{border-color:var(--ac);color:var(--ac2);background:var(--acdim)}
+.ans{background:var(--sf);border:1px solid var(--hl);border-radius:11px;padding:15px 17px;font-size:12.5px;line-height:2.0;color:#C7CFDC;white-space:pre-wrap;word-break:break-word}
+.ans .own{background:var(--acdim);color:var(--ac2);font-weight:700;padding:0 3px;border-radius:3px}
+.ans .riv{color:var(--tx);font-weight:700}
+.ans a{color:var(--ac);text-decoration:none;border-bottom:1px solid rgba(108,158,255,.35)}
+.ans a:hover{color:var(--ac2)}
+.cites .ci{display:flex;gap:8px;align-items:baseline;padding:7px 0;border-bottom:1px solid rgba(27,31,39,.6);font-size:11px}
+.ci .bk{flex-shrink:0;font-family:var(--mono);font-size:8.5px;padding:1px 7px;border-radius:99px;border:1px solid var(--hl2);color:var(--mu)}
+.ci a{color:var(--mu);text-decoration:none}
+.ci a:hover{color:var(--ac)}
+.foot{margin-top:44px;padding-top:16px;border-top:1px solid var(--hl);font-size:9.5px;color:var(--fa);font-family:var(--mono);letter-spacing:.05em;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.src{font-size:9px;color:var(--fa)}
+.qc-tag{font-family:var(--mono);font-size:9px;letter-spacing:.1em;display:inline-block;padding:2px 8px;border-radius:99px;border:1px solid}
+.tg-absent{color:var(--dn);border-color:rgba(255,92,122,.5)}
+.tg-behind{color:var(--wa);border-color:rgba(255,194,77,.45)}
+.tg-win{color:var(--up);border-color:rgba(63,217,143,.5)}
+</style>
+
+<header class="top"><div class="topin">
+<div class="logo" title="クリックで概況に戻る" onclick="switchTab('hq')"><span class="dot"></span><b>CAR × AI SIGNAL ROOM</b><span>TOYOTA GEO OPS</span></div>
+<nav class="tabs" id="tabs">
+<button class="tab on" data-v="hq"><span class="k">01</span>概況</button>
+<button class="tab" data-v="car"><span class="k">02</span>車種別</button>
+<button class="tab" data-v="seg"><span class="k">03</span>車型別</button>
+<button class="tab" data-v="cite"><span class="k">04</span>引用元</button>
+<button class="tab" data-v="ga"><span class="k">05</span>流入 × AI</button>
+
+</nav>
+<div class="tbar">
+<span class="upd" id="meta"></span>
+<input id="gsearch" placeholder="検索: 車種・質問" aria-label="検索">
+<button class="tbtn" id="btn-theme" title="配色をライト/ダーク切替" aria-label="配色切替">◐</button>
+<button class="tbtn" id="btn-print" title="印刷" aria-label="印刷">🖨</button>
+</div>
+</div></header>
+
+<div class="wrap">
+<section class="view on" id="v-hq"></section>
+<section class="view" id="v-car"></section>
+<section class="view" id="v-seg"></section>
+<section class="view" id="v-cite"></section>
+<section class="view" id="v-ga"></section>
+
+<div class="foot"><span>SOURCE: car-round 2026-08-28 実測 1,280セル ＋ GA4 28日実測 ／ 推定値なし・指名クエリ除外の規律を全集計で維持</span><span>車両画像: 各社公式サイトより（分析目的の内部利用・出典明記）</span></div>
+</div>
+
+<div class="tt" id="tt"></div>
+<div class="shade" id="shade"></div>
+<aside class="drawer" id="drawer" aria-label="回答ドロワー"></aside>
+
+<script>
+const DATA = __DATA__;
+const IMG = __IMG__;
+const BC = {toyota:'#6C9EFF',honda:'#C4515C',nissan:'#8A93A6',suzuki:'#7A8496',daihatsu:'#6A7488',mitsubishi:'#5C6678'};
+const BN = {toyota:'トヨタ',honda:'ホンダ',nissan:'日産',suzuki:'スズキ',daihatsu:'ダイハツ',mitsubishi:'三菱'};
+const SUR = {chatgpt:'ChatGPT',gemini:'Gemini',aio:'AIによる概要',aimode:'AIモード'};
+const SEGL = {compact_tall:'コンパクトトール',minivan_s:'スモールミニバン',minivan_m:'ミドルミニバン',minivan_l:'ラージミニバン',compact_hb:'コンパクト',suv_compact:'コンパクトSUV',suv_off:'本格オフローダー/SUV'};
+const $ = s=>document.querySelector(s);
+const esc = s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fx = n=>n.toLocaleString('ja-JP');
+const tt = $('#tt');
+function ttMove(x,y){const w=tt.offsetWidth,h=tt.offsetHeight;let L=x+14,T=y+14;if(L+w>innerWidth-8)L=x-w-14;if(T+h>innerHeight-8)T=y-h-14;tt.style.left=L+'px';tt.style.top=T+'px'}
+function bindTT(el,html){el.addEventListener('mousemove',e=>{tt.innerHTML=typeof html==='function'?html():html;tt.style.display='block';ttMove(e.clientX,e.clientY)});el.addEventListener('mouseleave',()=>tt.style.display='none')}
+function carThumb(id,name,brand,big){
+ if(IMG[id]) return `<img class="${big?'':'thumb'}" src="${IMG[id]}" alt="${esc(name)}" loading="lazy">`;
+ const c=BC[brand]||'#5C6678';
+ return `<span class="mono-thumb" style="color:${c};background:rgba(255,255,255,.03)">${esc(name.slice(0,2))}</span>`;
+}
+function switchTab(v){
+ document.querySelectorAll('#tabs .tab').forEach(x=>x.classList.toggle('on',x.dataset.v===v));
+ document.querySelectorAll('.view').forEach(x=>x.classList.remove('on'));
+ $('#v-'+v).classList.add('on'); window.scrollTo({top:0});
+}
+document.querySelectorAll('#tabs .tab').forEach(b=>b.addEventListener('click',()=>switchTab(b.dataset.v)));
+$('#meta').innerHTML = `データ更新 <b>${DATA.built} 07:35 JST</b> ／ ${fx(DATA.kpi.cells)}セル`;
+$('#btn-print').addEventListener('click',()=>window.print());
+$('#btn-theme').addEventListener('click',()=>{document.body.classList.toggle('light');try{localStorage.setItem('sr-theme',document.body.classList.contains('light')?'light':'dark')}catch(e){}});
+try{if(localStorage.getItem('sr-theme')==='light')document.body.classList.add('light')}catch(e){}
+$('#gsearch').addEventListener('keydown',e=>{if(e.key==='Enter')doSearch(e.target.value)});
+function doSearch(q){ q=(q||'').trim(); if(!q)return;
+ const cars=DATA.funnel.filter(f=>f.name.includes(q));
+ const segs=DATA.segs.filter(s=>s.label.includes(q));
+ const hits=[];
+ for(const [pid,d] of Object.entries(DATA.qdetail)){ if((d.q||'').includes(q)){hits.push({pid,q:d.q,cat:DATA.cat_labels[d.cat]||'—'}); if(hits.length>=25) break} }
+ openModal('検索結果: '+q, `
+ ${cars.length?'<div class="def"><span class="dh">車種</span>'+cars.map(f=>`<button class="jump srch-car" data-car="${f.id}" style="margin:3px 6px 3px 0">${esc(f.name)} →</button>`).join('')+'</div>':''}
+ ${segs.length?'<div class="def"><span class="dh">車型</span>'+segs.map(s=>`<button class="jump srch-seg" data-seg="${s.seg}" style="margin:3px 6px 3px 0">${s.label} →</button>`).join('')+'</div>':''}
+ ${hits.length?'<div class="def"><span class="dh">質問 '+hits.length+'件（クリックで4面詳細）</span>'+hits.map(x=>`<button class="jump srch-q" data-pid="${x.pid}" style="display:block;width:100%;text-align:left;margin:4px 0;font-size:11.5px">${esc(x.q)} <span class="chip">${esc(x.cat)}</span></button>`).join('')+'</div>':''}
+ ${!cars.length&&!segs.length&&!hits.length?'<p style="color:var(--fa)">該当なし。車種名（例: ライズ）や質問の語（例: 雪道）で検索できます。</p>':''}`);
+ document.querySelectorAll('.srch-car').forEach(b=>b.addEventListener('click',()=>{closeModal();curCar=b.dataset.car;renderCAR();switchTab('car')}));
+ document.querySelectorAll('.srch-seg').forEach(b=>b.addEventListener('click',()=>{closeModal();curSeg=b.dataset.seg;renderSEG();switchTab('seg')}));
+ document.querySelectorAll('.srch-q').forEach(b=>b.addEventListener('click',()=>showQueryDetail(b.dataset.pid)));
+}
+function svgOpen(w,h){return `<svg viewBox="0 0 ${w} ${h}" style="display:block;width:100%;height:auto">`}
+function segState(s){ return s.toyota_fsov>=60?['#3FD98F','優勢']:s.toyota_fsov>=40?['#FFC24D','接戦']:['#FF5C7A','劣勢'] }
+
+/* ================= modal & help ================= */
+function openModal(title, html){
+ let ms = $('#mshade');
+ if(!ms){ms=document.createElement('div');ms.id='mshade';ms.className='modal-shade';ms.innerHTML='<div class="modal" role="dialog" aria-modal="true"><div class="mh"><h4 id="mtitle"></h4><button class="mx" id="mx" aria-label="閉じる">✕</button></div><div class="mb" id="mbody"></div></div>';document.body.appendChild(ms);
+  ms.addEventListener('click',e=>{if(e.target===ms)closeModal()});$('#mx').addEventListener('click',closeModal);}
+ $('#mtitle').textContent=title; $('#mbody').innerHTML=html; ms.classList.add('on');
+ $('#mbody').querySelectorAll('[data-jump]').forEach(b=>b.addEventListener('click',()=>{closeModal();switchTab(b.dataset.jump)}));
+}
+function closeModal(){const ms=$('#mshade');if(ms)ms.classList.remove('on')}
+addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
+const HELP = {
+ f1:{t:'F1 露出機会',d:'AIが回答を生成した率 × 平均引用数（ノイズドメイン除外）。<b>8車種平均=100の指数</b>。低い＝そもそもAIがこの車の質問で回答・根拠を組み立てにくい。'},
+ f2:{t:'F2 車種言及',d:'出現すべき質問群（車名を含まない出現期待クエリ）で、回答に車名が登場した率。<b>指名クエリは分母から除外</b>（出現が自明でファネルが成立しなくなるため）。指数は8車種平均=100。セル内の<b>「通過％」は露出機会のうち実際に言及された割合の実測</b>で、露出機会と言及の差分（どれだけ取りこぼしているか）を直接示す。'},
+ f3:{t:'F3 第一想起',d:'言及された回答のうち、全車種中いちばん先に書かれた率。AIの回答は先頭の車が事実上の「推奨」— <b>言及されても2番手では選ばれない</b>。指数は8車種平均=100。セル内の<b>「通過％」は言及のうち首位を取れた割合の実測</b>。'},
+ f4:{t:'F4 流入',d:'toyota.jp該当車種ページのセッション（GA4・直近28日実測）。指数は8車種平均=100。AI上の露出が公式サイトへの来訪に変換できているかを見る。'},
+ katarare:{t:'語られ指数',d:'AI言及シェア ÷ 販売台数シェア × 100（どちらも8車種内）。<b>100未満＝売れ行きに比べAIに語られていない</b>。販売台数は自販連・全軽自協の公表実数（月次差し替え）。ランクル250は通称名集計の都合上ランドクルーザー系合算。'},
+ density:{t:'候補密度',d:'回答が生成されたセルで検出された車種数の平均。<b>高い＝AIがリスト形式で多くの車を挙げる車型</b>（露出機会が多い）／低い＝1〜2台しか挙がらないゼロサム（候補から落ちると完全不在）。'},
+ sov:{t:'言及SoV',d:'その車型の非指名セルで検出された全言及のうち、トヨタ車が占める割合。競合を含む同じ土俵での占有率。'},
+ fsov:{t:'第一想起SoV',d:'その車型で「回答の最初に書かれた車」のうちトヨタ車が占めた割合。言及SoVとの乖離が大きい車型は「出るのに最初に書かれない」＝語順の問題。'},
+ vocab:{t:'語られ方プロファイル',d:'その車が言及された回答で、<b>車名の前後±250字</b>に各軸の語（例: 燃費, km/L）が共起したセルの率。実測カウントであり評価スコアではない。'},
+ cite:{t:'引用の役割分類',d:'<b>トヨタ公式</b>=toyota.jp・global.toyota ／ <b>競合公式</b>=ホンダ・日産・スズキ・ダイハツ・三菱の公式ドメイン ／ <b>販売店</b>=販社サイト ／ <b>メディア他</b>=実URLが判明したその他 ／ <b>発信元不明</b>=google.com/goto・vertexaisearch経由のリダイレクタでURLから発信元が特定できないもの。<b>数字を作らない原則で「不明」のまま表示</b>（title復元＝バックログ②で解像度が上がる）。'},
+ rule:{t:'計測の規律',d:'①推定値・デモ値は画面に出さない（無い数値は「—」）②指名クエリをF2/F3の分母に入れない ③クエリIDは不変（時系列を壊さない）④計測は2026-08-28の1周（$38・1,280セル）で、全回答本文と引用を保存済み。'},
+ quest:{t:'質問インテル',d:'この車の出現期待クエリ（車名を含まないが候補に挙がるべき質問）をカテゴリ台帳（安全/燃費・環境/費用/モデル比較/サービス/ブランド/購入検討）で分解し、それぞれの言及率を実測したもの。<b>低いカテゴリ＝その文脈の質問でこの車が候補に挙がっていない</b>。'},
+ trend:{t:'28日トレンド',d:'日次スキャン（60クエリ）の言及ヒット実測を、<b>直近14日合算 vs その前14日合算</b>で比較した変化率。±8%を上昇/下降の閾値とする。本計測（377クエリ×4AI面）の週次時系列は、car-roundのcron化（バックログ③・月約$330）導入後にこのボードへそのまま載る。'},
+ geo:{t:'トヨタGEO総合スコア',d:'7車型の実測を合算した <b>(言及SoV + 第一想起SoV) ÷ 2</b>。どちらも競合を含む同じ土俵での占有率で、推定を含まない。100=その土俵の言及・首位をトヨタが独占。'},
+ conv:{t:'AI→流入変換指数',d:'<b>GA流入シェア ÷ AI言及シェア × 100</b>（どちらも8車種内）。100=釣り合い。100未満=AIで語られる割に toyota.jp へ来ていない（受け皿の課題）。100超=語られる以上に来ている（指名検索が強い）。'},
+ radar:{t:'得意・不得意レーダー',d:'分母=当該車型のカテゴリ別・非指名セル。<b>言及率</b>=回答に登場した率／<b>推奨度（首位率）</b>=言及された回答のうち最初に挙がった率。比較対象はその車型で言及数最大の競合車。データが薄いカテゴリ（3セル未満）は軸から除外。'},
+ pos:{t:'好意的言及率',d:'言及された回答のうち、計測器のセンチメント判定が positive だった率（実測）。文脈の質は「語られ方プロファイル」と合わせて読む。'},
+ surf:{t:'AI面',d:'回答を取得する4つの面: ChatGPT / Gemini / Googleの「AIによる概要」/ 同「AIモード」。面ごとに引用の返り方も言及傾向も異なるため、施策は面別に考える。'},
+};
+function help(key){const h=HELP[key];if(h)openModal('指標の定義 — '+h.t,`<div class="def"><span class="dh">DEFINITION</span>${h.d}</div>`)}
+function qm(key){return `<span class="qmark" role="button" tabindex="0" data-help="${key}" aria-label="定義を見る">?</span>`}
+function bindHelp(scope){document.querySelectorAll((scope||'')+' [data-help]').forEach(b=>{if(!b._h){b._h=1;b.addEventListener('click',e=>{e.stopPropagation();help(b.dataset.help)})}})}
+
+/* ================= 01 司令室 ================= */
+const FINDS = [
+ {no:'FINDING 01', ev:'24 vs 9<small>セル</small>', h:'ルーミーの敵は、自分自身だった', p:'コンパクトトールの回答でトール（ダイハツ名義の同一車）だけが挙がったセルは24、ルーミーだけは9。第一想起シェアもトール35.8%・ソリオ31.6%・ルーミー8.4%。AIはこの車を「ダイハツの車」として語っている。', go:'seg', gol:'車型ウォーズで見る'},
+ {no:'FINDING 02', ev:'381 vs 402<small>件</small>', h:'トヨタ公式は、競合公式より引用されていない', p:'引用8,779件のうちトヨタ公式(toyota.jp等)は381件、競合5社の公式は402件。8車種が主役の計測なのに公式引用で負けている。AIの「教科書」をメディアと競合に握られている状態。', go:'cite', gol:'引用インテルで見る'},
+ {no:'FINDING 03', ev:'0<small>セル</small>', h:'ヴェルファイア、AIの中で消える', p:'ラージミニバン152セルでヴェルファイアが単独で挙がった回答はゼロ（アルファード単独は26）。AIにとって「アルヴェル」はアルファードの別名になっており、ヴェルファイア指名検討層への回路が閉じている。', go:'seg', gol:'車型ウォーズで見る'},
+ {no:'FINDING 04', ev:'8.3<small>%</small>', h:'ライズは「安全」の質問で消滅する', p:'ライズの安全カテゴリ言及率は8.3%（燃費・環境は100%）。回答内の語られ方でも安全装備との共起は23.4%で8車種文脈の中で極端に薄い。全面不在の実回答も保存されている。', go:'read', gol:'実物の回答を読む'},
+ {no:'FINDING 05', ev:'25 vs 56<small>%</small>', h:'AI面ごとに別の戦争をしている', p:'同じライズでもGemini言及56.2%に対しAIモードは25.0%。面ごとに引用も言及も傾向が違い、「どのAI面を攻めるか」を決めずに施策は打てない。', go:'car', gol:'車種オペで面別を見る'},
+ {no:'FINDING 06', ev:'-4.4<small>pt</small>', h:'ミニバン2枚看板は露出を流入に変換できていない', p:'ヴォクシー・ノアはAI言及シェアに対しGA流入シェアが4.4pt低い。逆にランクル250は語られていないのに流入している（AI側の伸び代最大）。', go:'ga', gol:'GA×AIで見る'},
+];
+const BNL = {F1:'露出機会',F2:'言及',F3:'第一想起',F4:'流入'};
+const FINDS2 = [
+ {sev:'高', h:'ルーミー、OEM兄弟のトール（ダイハツ）に劣後', ev:'首位SoV 11%',
+  p:'コンパクトトール型の第一想起シェアはトール35.8%・ソリオ31.6%に対しルーミー8.4%。単独露出もトール24セル vs ルーミー9セル。同一車ながらダイハツ名義が回答の主語になっている。', go:'seg', gol:'車型別で見る'},
+ {sev:'高', h:'シエンタ・ノア・ヴェルファイア、言及トレンド2桁下降', ev:'-12〜-13%',
+  p:'直近14日の言及ヒットが前14日比でシエンタ-12%・ノア-13%・ヴェルファイア-12%。ミニバン系が揃って下降局面。ライズ+13%・ランクル250+18%と対照的。', go:'hq', gol:'トレンドで見る'},
+ {sev:'高', h:'公式引用、競合5社連合に逆転される', ev:'381 vs 402件',
+  p:'トヨタ公式引用381件に対し競合5社の公式は402件。8車種が主役の計測での逆転。AIの根拠の95%超が外部サイト依存。', go:'cite', gol:'引用元で見る'},
+ {sev:'高', h:'ライズ、安全系クエリで圏外', ev:'言及 8.3%',
+  p:'安全カテゴリの言及率8.3%（燃費・環境100%、費用55%と対照的）。ブランドカテゴリは0%。安全文脈の質問で候補に挙がっていない。', go:'car', gol:'車種別で見る'},
+ {sev:'中', h:'ヴェルファイア、アルファードに吸収', ev:'単独露出 0セル',
+  p:'ラージミニバン152セルで単独露出ゼロ（アルファード単独26セル）。AIの中で「アルヴェル」はアルファードの別名になっている。', go:'seg', gol:'車型別で見る'},
+ {sev:'中', h:'ライズ、AIモードで失速', ev:'-31pt',
+  p:'Gemini言及56.2%に対しAIモード25.0%。面ごとに傾向が異なり、面別の施策設計が必要。', go:'car', gol:'車種別で見る'},
+ {sev:'低', h:'ヴォクシー・ノア、AI露出が流入に未変換', ev:'-4.4pt',
+  p:'AI言及シェアに対しGA流入シェアが4.4pt低い。回答内の引用リンク獲得（受け皿）が課題。ランクル250は逆に+3.6pt。', go:'ga', gol:'流入×AIで見る'},
+];
+function geoScoreAll(){
+ let tm=0, am=0, tf=0, af=0;
+ for(const s of DATA.segs){
+  for(const r of s.rows){ am+=r.mentions; af+=r.firsts; if(r.brand==='toyota'){tm+=r.mentions; tf+=r.firsts} }
+ }
+ return {sov:100*tm/am, fsov:100*tf/af, score: Math.round((100*tm/am + 100*tf/af)/2)};
+}
+function trendOfSeries(t){const n=t.length;const a=t.slice(Math.max(0,n-14)).reduce((x,y)=>x+y,0),b=t.slice(Math.max(0,n-28),Math.max(0,n-14)).reduce((x,y)=>x+y,0);return {a,b,pct:b>0?Math.round(100*(a-b)/b):null}}
+function ma7(t){return t.map((_,i)=>t.slice(Math.max(0,i-6),i+1).reduce((x,y)=>x+y,0)/Math.min(i+1,7))}
+function trendOf(id){
+ const g=DATA.ga.find(x=>x.id===id); if(!g||!g.trend28) return null;
+ const t=g.trend28.map(x=>x[1]); const n=t.length;
+ const a=t.slice(Math.max(0,n-14)).reduce((x,y)=>x+y,0), b=t.slice(Math.max(0,n-28),Math.max(0,n-14)).reduce((x,y)=>x+y,0);
+ return {a,b,pct: b>0? Math.round(100*(a-b)/b): null, series:t};
+}
+function sparkSvg(series,w,h,color){
+ const mx=Math.max(...series,1);
+ const pts=series.map((v,i)=>`${(i/(series.length-1)*w).toFixed(1)},${(h-2-(v/mx)*(h-5)).toFixed(1)}`).join(' ');
+ return `<svg viewBox="0 0 ${w} ${h}" style="display:block;width:${w}px;height:${h}px"><polyline points="${pts}" fill="none" stroke="${color}" stroke-width="1.5"/><circle cx="${w}" cy="${h-2-(series[series.length-1]/mx)*(h-5)}" r="2" fill="${color}"/></svg>`;
+}
+function trendChip(id){
+ const t=trendOf(id); if(!t||t.pct==null) return '<span class="num" style="color:var(--fa)">—</span>';
+ const up=t.pct>=8, dn=t.pct<=-8;
+ const col=up?'var(--up)':dn?'var(--dn)':'var(--mu)';
+ return `<span style="display:inline-flex;align-items:center;gap:7px">${sparkSvg(t.series,54,18,col)}<span class="num" style="color:${col};font-weight:700">${t.pct>0?'+':''}${t.pct}%</span></span>`;
+}
+function convOf(id){
+ const g=DATA.ga.find(x=>x.id===id); if(!g||!g.ai_share) return null;
+ return Math.round(100*g.ga_share/g.ai_share);
+}
+function donutGauge(val,size,color,center,sub){
+ const sw=15, r=(size-sw-6)/2, c=size/2, circ=2*Math.PI*r, frac=Math.min(val/100,1);
+ return `<svg viewBox="0 0 ${size} ${size}" style="display:block;width:100%;max-width:${size}px;height:auto;margin:0 auto">
+ <circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="var(--hl)" stroke-width="${sw}"/>
+ <circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="${color}" stroke-width="${sw}" stroke-linecap="round"
+  stroke-dasharray="${(circ*frac).toFixed(1)} ${circ.toFixed(1)}" transform="rotate(-90 ${c} ${c})"/>
+ <text x="${c}" y="${c-4}" text-anchor="middle" fill="var(--tx)" font-size="${size*0.21}" font-weight="800" font-family="JetBrains Mono">${center}</text>
+ <text x="${c}" y="${c+size*0.12}" text-anchor="middle" fill="var(--fa)" font-size="${size*0.058}">${sub}</text></svg>`;
+}
+function brandDonut(size){
+ const data=DATA.cross.brand_sov;
+ const cols={toyota:'#6C9EFF',honda:'#8A93A6',nissan:'#6E7887',suzuki:'#5A6478',daihatsu:'#4A5260',mitsubishi:'#3C4450'};
+ const sw=17, r=(size-sw-6)/2, c=size/2, circ=2*Math.PI*r;
+ let off=0, segs='';
+ for(const b of data){
+  const len=circ*b.sov/100;
+  segs+=`<circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="${cols[b.brand]||'#3C4450'}" stroke-width="${sw}"
+   stroke-dasharray="${Math.max(len-2,0.5).toFixed(1)} ${circ.toFixed(1)}" stroke-dashoffset="${(-off).toFixed(1)}" transform="rotate(-90 ${c} ${c})"/>`;
+  off+=len;
+ }
+ return `<svg viewBox="0 0 ${size} ${size}" style="display:block;width:100%;max-width:${size}px;height:auto;margin:0 auto">${segs}
+ <text x="${c}" y="${c-4}" text-anchor="middle" fill="var(--tx)" font-size="${size*0.2}" font-weight="800" font-family="JetBrains Mono">${DATA.cross.brand_sov[0].sov}%</text>
+ <text x="${c}" y="${c+size*0.12}" text-anchor="middle" fill="var(--fa)" font-size="${size*0.06}">トヨタ言及シェア</text></svg>`;
+}
+function heroTrendChart(){
+ const ty=new Array(31).fill(0), rv=new Array(31).fill(0);
+ for(const o of DATA.ovtrend){ o.series.forEach((v,i)=>{ if(o.brand==='toyota') ty[i]+=v; else rv[i]+=v }) }
+ const tyM=ma7(ty), rvM=ma7(rv);
+ const tt_=trendOfSeries(ty), rt=trendOfSeries(rv);
+ const W=640,H=240,P={l:44,r:118,t:16,b:26};
+ const mx=Math.max(...tyM,...rvM,1);
+ const X=i=>P.l+i/30*(W-P.l-P.r), Y=v=>H-P.b-(v/mx)*(H-P.t-P.b);
+ let s=svgOpen(W,H);
+ [0.5,1].forEach(f=>{s+=`<line class="gline" x1="${P.l}" y1="${Y(mx*f)}" x2="${W-P.r}" y2="${Y(mx*f)}"/><text x="${P.l-5}" y="${Y(mx*f)+3}" text-anchor="end" fill="var(--fa)" font-size="9" font-family="JetBrains Mono">${Math.round(mx*f)}</text>`});
+ s+=`<polyline points="${ty.map((v,i)=>X(i)+','+Y(v)).join(' ')}" fill="none" stroke="#6C9EFF" stroke-width="1" opacity=".3"/>`;
+ s+=`<polyline points="${rv.map((v,i)=>X(i)+','+Y(v)).join(' ')}" fill="none" stroke="#8A93A6" stroke-width="1" opacity=".25"/>`;
+ s+=`<polyline points="${tyM.map((v,i)=>X(i)+','+Y(v)).join(' ')}" fill="none" stroke="#6C9EFF" stroke-width="2.6"/>`;
+ s+=`<polyline points="${rvM.map((v,i)=>X(i)+','+Y(v)).join(' ')}" fill="none" stroke="#8A93A6" stroke-width="2"/>`;
+ s+=`<text x="${W-P.r+8}" y="${Y(tyM[30])+3}" fill="var(--tx)" font-size="11" font-weight="700">トヨタ計 <tspan fill="${tt_.pct>=0?'#3FD98F':'#FF5C7A'}" font-family="JetBrains Mono">${tt_.pct>0?'+':''}${tt_.pct}%</tspan></text>`;
+ s+=`<text x="${W-P.r+8}" y="${Y(rvM[30])+3}" fill="var(--mu)" font-size="11">競合計 <tspan fill="${rt.pct>=0?'#3FD98F':'#FF5C7A'}" font-family="JetBrains Mono">${rt.pct>0?'+':''}${rt.pct}%</tspan></text>`;
+ DATA.days.forEach((d,i)=>{if(i%5===0)s+=`<text x="${X(i)}" y="${H-7}" text-anchor="middle" fill="var(--fa)" font-size="9" font-family="JetBrains Mono">${d.slice(5)}</text>`});
+ return s+'</svg>';
+}
+function renderHQ(){
+ const a = DATA.cite.all, geo = geoScoreAll();
+ const weakSegs = DATA.segs.filter(s=>s.toyota_fsov<40);
+ const bn = {}; DATA.funnel.forEach(f=>bn[f.bottleneck]=(bn[f.bottleneck]||0)+1);
+ const katLow = DATA.funnel.filter(f=>f.katarare<70);
+ const ups = DATA.funnel.filter(f=>{const t=trendOf(f.id);return t&&t.pct!=null&&t.pct>=8}).length;
+ const dns = DATA.funnel.filter(f=>{const t=trendOf(f.id);return t&&t.pct!=null&&t.pct<=-8}).length;
+ const gcol = geo.score>=60?'#3FD98F':geo.score>=40?'#FFC24D':'#FF5C7A';
+ let h = `
+ <div class="heroP">
+  <div class="card hp" data-st="geo" role="button" tabindex="0"><h3>トヨタGEO総合スコア ${qm('geo')}</h3>
+   ${donutGauge(geo.score,210,gcol,geo.score+'<tspan font-size="15" fill="var(--fa)">/100</tspan>','7車型・競合込み実測')}
+   <div class="hpfoot"><span>言及SoV <b class="num">${geo.sov.toFixed(1)}%</b></span><span>第一想起SoV <b class="num">${geo.fsov.toFixed(1)}%</b></span></div></div>
+  <div class="card hp" data-st="sov" role="button" tabindex="0"><h3>ブランド別シェア（車型横断） ${qm('sov')}</h3>
+   ${brandDonut(210)}
+   <div class="hpfoot">${DATA.cross.brand_sov.slice(0,3).map(b=>`<span><i class="lg" style="background:${b.brand==='toyota'?'#6C9EFF':'#8A93A6'}"></i>${BN[b.brand]} <b class="num">${b.sov}%</b></span>`).join('')}</div></div>
+  <div class="card hp hpwide" data-st="trend" role="button" tabindex="0"><h3>言及量トレンド — トヨタ計 vs 競合計（31日実測・7日移動平均） ${qm('trend')}</h3>
+   ${heroTrendChart()}</div>
+ </div>
+ <div class="statusbar sb-sub" style="margin-top:12px">
+  <button class="st" data-st="cite"><span class="ic">›</span><div class="v" style="font-size:16px;color:var(--dn)">${a.own}<small> vs ${a.comp}</small></div><div class="l">公式引用 トヨタvs競合</div></button>
+  <button class="st" data-st="trend"><span class="ic">›</span><div class="v" style="font-size:16px"><span style="color:var(--up)">▲${ups}</span> <span style="color:var(--dn)">▼${dns}</span></div><div class="l">8車種のトレンド</div></button>
+  <button class="st" data-st="bneck"><span class="ic">›</span><div class="v" style="font-size:16px;color:var(--dn)">第一想起×${bn.F3||0}</div><div class="l">最多ボトルネック</div></button>
+  <button class="st" data-st="segweak"><span class="ic">›</span><div class="v" style="font-size:16px;color:var(--dn)">${weakSegs.length}<small>/7車型</small></div><div class="l">首位SoV 40%未満</div></button>
+  <button class="st" data-st="kat"><span class="ic">›</span><div class="v" style="font-size:16px;color:var(--dn)">${katLow.length}<small>車種</small></div><div class="l">語られ指数 70未満</div></button>
+  <button class="st" data-st="redir"><span class="ic">›</span><div class="v" style="font-size:16px;color:var(--wa)">77<small>%</small></div><div class="l">引用の発信元不明</div></button>
+  <button class="st" data-st="round"><span class="ic">›</span><div class="v" style="font-size:16px">${fx(DATA.kpi.cells)}</div><div class="l">計測セル・規律</div></button>
+ </div>
+ <div class="sec" style="margin-top:20px"><h2>アラート</h2><div class="ln"></div><span class="tag">危険度3段階 ／ クリックで根拠</span></div>
+ <div class="alerts">${FINDS2.map((f,i)=>`<button class="al" data-i="${i}">
+  <span class="sev ${f.sev==='高'?'crit':f.sev==='中'?'warn':'info'}">危険度 ${f.sev}</span>
+  <span class="msg">${f.h}</span>
+  <span class="evd">${f.ev}</span>
+  <span class="arw">›</span></button>`).join('')}
+ </div>
+ <div class="sec"><h2>トレンド — 上がっている車・下がっている車 ${qm('trend')}</h2><div class="ln"></div><span class="tag">日次スキャン実測 31日 ／ 直近14日 vs 前14日 ／ 行クリックで拡大</span></div>
+ <div class="grid c32">
+  <div class="card"><h3>全30車種 変化率ランキング（競合含む）</h3><div class="sub">太字=トヨタ。<b>競合の上昇も監視対象</b></div>
+   <div class="grid c2" style="gap:4px 22px">${(()=>{
+    const rows=DATA.ovtrend.map(o=>({...o,tr:trendOfSeries(o.series)})).filter(o=>o.tr.pct!=null&&o.tr.b>=20).sort((a,b)=>b.tr.pct-a.tr.pct);
+    const render=r=>`<button class="ovrow clicky" data-id="${r.id}" style="display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;background:none;border:none;border-bottom:1px solid rgba(27,31,39,.6);padding:5px 2px;text-align:left">
+     <span style="font-size:11.5px;color:${r.brand==='toyota'?'var(--tx)':'var(--mu)'};font-weight:${r.brand==='toyota'?700:400};overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(r.name)} <span class="chip ${r.brand==='toyota'?'ty':''}" style="font-size:8px">${BN[r.brand]}</span></span>
+     ${sparkSvg(r.series,56,16,r.tr.pct>=8?'#3FD98F':r.tr.pct<=-8?'#FF5C7A':'#545E70')}
+     <span class="num" style="font-size:11.5px;font-weight:700;color:${r.tr.pct>=8?'var(--up)':r.tr.pct<=-8?'var(--dn)':'var(--mu)'};min-width:44px;text-align:right">${r.tr.pct>0?'+':''}${r.tr.pct}%</span></button>`;
+    return `<div><div style="font-size:9.5px;color:var(--up);letter-spacing:.1em;margin-bottom:4px;font-family:var(--mono)">▲ 上昇 TOP7</div>${rows.slice(0,7).map(render).join('')}</div>
+     <div><div style="font-size:9.5px;color:var(--dn);letter-spacing:.1em;margin-bottom:4px;font-family:var(--mono)">▼ 下降 TOP7</div>${rows.slice(-7).reverse().map(render).join('')}</div>`;
+   })()}</div>
+   <div class="note">分母が小さい車種（前14日20ヒット未満）は変化率が暴れるため除外。</div></div>
+  <div class="card"><h3>重点8車種 31日推移（7日移動平均）</h3><div class="sub">生データは薄線、太線=移動平均</div>
+   <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">${DATA.funnel.map(f=>{
+    const o=DATA.ovtrend.find(x=>x.id===f.id); if(!o) return '';
+    const tr=trendOfSeries(o.series); const col=tr.pct>=8?'#3FD98F':tr.pct<=-8?'#FF5C7A':'#8A93A6';
+    const m=ma7(o.series), mx=Math.max(...o.series,1), W=150,H=44;
+    const pts=a=>a.map((v,i)=>`${(i/(a.length-1)*W).toFixed(1)},${(H-3-(v/mx)*(H-8)).toFixed(1)}`).join(' ');
+    return `<button class="ovrow clicky" data-id="${f.id}" style="background:var(--sf2);border:1px solid var(--hl);border-radius:9px;padding:7px 10px;text-align:left">
+     <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:10.5px;font-weight:700">${esc(f.name)}</span><span class="num" style="font-size:10.5px;font-weight:700;color:${col}">${tr.pct!=null?(tr.pct>0?'+':'')+tr.pct+'%':'—'}</span></div>
+     <svg viewBox="0 0 ${W} ${H}" style="display:block;width:100%;height:auto"><polyline points="${pts(o.series)}" fill="none" stroke="#2A3140" stroke-width="1"/><polyline points="${pts(m)}" fill="none" stroke="${col}" stroke-width="1.8"/></svg></button>`;
+   }).join('')}</div></div>
+ </div>
+ <div class="sec"><h2>ファネル・ボトルネックボード ${qm('rule')}</h2><div class="ln"></div><span class="tag">露出機会→言及→第一想起→流入 ／ セルクリック=内訳 ／ 列見出し=並べ替え</span></div>
+ <div class="card" style="padding:12px 16px"><div class="tw"><table class="fb" id="fboard"><thead><tr>
+  <th data-k="name">車種</th>
+  <th data-k="f1">露出機会 <span class="qmark" role="button" tabindex="0" data-help="f1">?</span></th>
+  <th data-k="f2">言及 <span class="qmark" role="button" tabindex="0" data-help="f2">?</span></th>
+  <th data-k="f3">第一想起 <span class="qmark" role="button" tabindex="0" data-help="f3">?</span></th>
+  <th data-k="f4">流入 <span class="qmark" role="button" tabindex="0" data-help="f4">?</span></th>
+  <th data-k="bv" class="on">ボトルネック</th>
+  <th>28日トレンド <span class="qmark" role="button" tabindex="0" data-help="trend">?</span></th>
+  <th data-k="katarare">語られ指数 <span class="qmark" role="button" tabindex="0" data-help="katarare">?</span></th>
+ </tr></thead><tbody></tbody></table></div>
+ <div class="note">指数=8車種平均100。<b>ボトルネック=4段のうち最も低い段</b>（赤リング）。<b>「通過％」＝前の段からの通過率の実測</b>（言及セルの通過％＝露出機会のうち実際に言及された割合／第一想起の通過％＝言及のうち首位を取れた割合）。露出機会と言及の差分はこの通過％で読む。トレンドは日次スキャン(60クエリ)の言及ヒット実測。</div></div>
+ <div class="sec"><h2>重点8車種</h2><div class="ln"></div><span class="tag">クリックで車種別へ</span></div>
+ <div class="cargrid">${DATA.funnel.map(f=>{
+  const k=f.katarare, kw=Math.min(Math.abs(k-100)/100*50,50);
+  return `<button class="cg" data-car="${f.id}">
+   <div class="imgw">${carThumb(f.id,f.name,'toyota',true)}</div>
+   <div class="bd"><div style="display:flex;justify-content:space-between;align-items:baseline"><span class="nm">${esc(f.name)}</span>${trendChip(f.id)}</div><div class="sg">${SEGL[f.seg]||f.seg} ／ 弱点: ${BNL[f.bottleneck]}</div>
+   <div class="row"><span>言及率 <b class="num" style="font-size:12px;color:var(--tx)">${f.mr}%</b></span><span>第一想起 <b class="num" style="font-size:12px;color:var(--tx)">${f.fr}%</b></span></div>
+   <div class="kb"><em></em><i style="${k>=100?`left:50%;width:${kw}%`:`left:${50-kw}%;width:${kw}%`};background:${k>=100?'var(--up)':'var(--dn)'}"></i></div>
+   <div class="row" style="margin-top:5px"><span>語られ指数</span><span class="num" style="color:${k>=100?'var(--up)':'var(--dn)'};font-weight:700">${k}</span></div>
+   </div></button>`}).join('')}
+ </div>`;
+ $('#v-hq').innerHTML = h;
+ document.querySelectorAll('#v-hq .st, #v-hq .hp').forEach(b=>b.addEventListener('click',e=>{if(e.target.closest('.qmark'))return;showStat(b.dataset.st)}));
+ document.querySelectorAll('#v-hq .al').forEach(b=>b.addEventListener('click',()=>showAlert(+b.dataset.i)));
+ document.querySelectorAll('#v-hq .cg').forEach(b=>b.addEventListener('click',()=>{curCar=b.dataset.car;renderCAR();switchTab('car')}));
+ fboardRender('bv'); bindHelp('#v-hq');
+ document.querySelectorAll('#v-hq .ovrow').forEach(b=>b.addEventListener('click',()=>showOvTrend(b.dataset.id)));
+ document.querySelectorAll('#fboard th').forEach(th=>th.addEventListener('click',e=>{
+  if(e.target.classList.contains('qmark'))return;
+  if(!th.dataset.k)return;
+  document.querySelectorAll('#fboard th').forEach(x=>x.classList.toggle('on',x===th));
+  fboardRender(th.dataset.k);
+ }));
+}
+function showOvTrend(id){
+ const o=DATA.ovtrend.find(x=>x.id===id); if(!o) return;
+ const tr=trendOfSeries(o.series); const col=tr.pct>=8?'#3FD98F':tr.pct<=-8?'#FF5C7A':'#8A93A6';
+ const m=ma7(o.series), mx=Math.max(...o.series,1), W=560,H=180,P=28;
+ const X=i=>P+ i/(o.series.length-1)*(W-P*2), Y=v=>H-24-(v/mx)*(H-48);
+ let s=svgOpen(W,H);
+ s+=`<line x1="${P}" y1="${Y(mx)}" x2="${W-P}" y2="${Y(mx)}" class="gline"/><text x="${P-4}" y="${Y(mx)+3}" text-anchor="end" fill="#545E70" font-size="9" font-family="JetBrains Mono">${mx}</text>`;
+ s+=`<polyline points="${o.series.map((v,i)=>X(i)+','+Y(v)).join(' ')}" fill="none" stroke="#2A3140" stroke-width="1.2"/>`;
+ s+=`<polyline points="${m.map((v,i)=>X(i)+','+Y(v)).join(' ')}" fill="none" stroke="${col}" stroke-width="2.4"/>`;
+ s+=`<circle cx="${X(o.series.length-1)}" cy="${Y(m[m.length-1])}" r="3.5" fill="${col}"/>`;
+ DATA.days.forEach((d,i)=>{if(i%5===0)s+=`<text x="${X(i)}" y="${H-6}" text-anchor="middle" fill="#545E70" font-size="8.5" font-family="JetBrains Mono">${d.slice(5)}</text>`});
+ openModal(o.name+' — 言及トレンド 31日（実測）', `<div style="display:flex;gap:18px;align-items:baseline;margin-bottom:8px">
+  <span class="num" style="font-size:26px;font-weight:800;color:${col}">${tr.pct!=null?(tr.pct>0?'+':'')+tr.pct+'%':'—'}</span>
+  <span style="font-size:11px;color:var(--mu)">直近14日 <b class="num">${tr.a}</b>ヒット ／ 前14日 <b class="num">${tr.b}</b>ヒット ／ ${BN[o.brand]}</span></div>
+ ${s}</svg><div class="note">日次スキャン（60クエリ）での言及ヒット。細線=日次実測、太線=7日移動平均。</div>`);
+}
+function showAlert(i){
+ const f=FINDS2[i];
+ openModal('危険度'+f.sev+' — '+f.h, `<div class="def"><span class="dh">EVIDENCE</span><span class="num" style="font-size:20px;font-weight:800;color:var(--ac2)">${f.ev}</span></div><p>${f.p}</p><button class="jump" data-jump="${f.go}">→ ${f.gol}</button>`);
+}
+function showStat(kind){
+ const a=DATA.cite.all, c=DATA.cross;
+ if(kind==='geo'){
+  const geo=geoScoreAll();
+  openModal('トヨタGEO総合スコア '+geo.score+'/100', `<p><b>定義:</b> 7車型の実測を合算した (言及SoV ${geo.sov.toFixed(1)}% + 第一想起SoV ${geo.fsov.toFixed(1)}%) ÷ 2。<b>競合を含む同じ土俵での占有率の平均</b>で、推定を含まない。</p>
+  <div class="tw"><table class="t"><thead><tr><th>車型</th><th>GEOスコア</th><th>言及SoV</th><th>第一想起SoV</th></tr></thead><tbody>
+  ${[...DATA.segs].map(s=>({...s,score:Math.round((s.toyota_sov+s.toyota_fsov)/2)})).sort((x,y)=>y.score-x.score).map(s=>`<tr><td>${s.label}</td>
+   <td><div style="display:inline-block;width:${s.score*1.3}px;height:9px;background:${s.score>=60?'var(--up)':s.score>=40?'var(--wa)':'var(--dn)'};border-radius:3px;vertical-align:middle;margin-right:8px"></div><b class="num">${s.score}</b></td>
+   <td class="num">${s.toyota_sov}%</td><td class="num">${s.toyota_fsov}%</td></tr>`).join('')}
+  </tbody></table></div><button class="jump" data-jump="seg">→ 車型別で見る</button>`);
+ }
+ if(kind==='trend'){
+  openModal('言及トレンド — 直近14日 vs 前14日（実測）', `<p>日次スキャン（60クエリ）の言及ヒット合算の変化率。<b>本計測(377クエリ×4面)の時系列は週次cron導入後に追加</b>。</p>
+  <div class="tw"><table class="t"><thead><tr><th>車種</th><th>推移(31日)</th><th>直近14日</th><th>前14日</th><th>変化</th></tr></thead><tbody>
+  ${DATA.funnel.map(f=>{const t=trendOf(f.id);if(!t)return '';const col=t.pct>=8?'var(--up)':t.pct<=-8?'var(--dn)':'var(--mu)';
+   return `<tr><td>${esc(f.name)}</td><td>${sparkSvg(t.series,90,20,col)}</td><td class="num">${t.a}</td><td class="num" style="color:var(--fa)">${t.b}</td><td class="num" style="color:${col};font-weight:700">${t.pct>0?'+':''}${t.pct??'—'}%</td></tr>`}).join('')}
+  </tbody></table></div>`);
+ }
+ if(kind==='sov'){
+  openModal('車型横断クエリのブランドSoV', `<p>車型をまたぐ比較質問（${c.cells}セル）で検出された言及のブランド別シェア。</p>
+  <div class="tw"><table class="t"><thead><tr><th>ブランド</th><th>言及SoV</th><th>第一想起SoV</th></tr></thead><tbody>
+  ${c.brand_sov.map(b=>{const f=(c.brand_fsov.find(x=>x.brand===b.brand)||{}).fshare??'—';
+   return `<tr><td>${BN[b.brand]||b.brand}</td><td><div style="display:inline-block;width:${b.sov*2.4}px;height:9px;background:${b.brand==='toyota'?'var(--ac)':'#39404D'};border-radius:3px;vertical-align:middle;margin-right:8px"></div><span class="num">${b.sov}%</span></td><td class="num">${f}%</td></tr>`}).join('')}
+  </tbody></table></div>`);
+ }
+ if(kind==='bneck'){
+  openModal('ボトルネック分布 — どの段で詰まっているか', `<div class="tw"><table class="t"><thead><tr><th>車種</th><th>最も低い段</th><th>指数</th><th>意味</th></tr></thead><tbody>
+  ${[...DATA.funnel].sort((x,y)=>x.bv-y.bv).map(f=>`<tr><td>${esc(f.name)}</td><td><span class="bpill">${BNL[f.bottleneck]}</span></td><td class="num" style="color:var(--dn)">${f.bv}</td><td style="font-size:11px;color:var(--fa)">${{F1:'回答・引用の土台が薄い',F2:'候補に挙がらない',F3:'最初に書かれない',F4:'流入に変換できない'}[f.bottleneck]}</td></tr>`).join('')}
+  </tbody></table></div>`);
+ }
+ if(kind==='segweak'){
+  const ws=DATA.segs.filter(s=>s.toyota_fsov<40);
+  openModal('第一想起SoVが40%未満の車型', ws.map(s=>`<div class="def"><span class="dh">${s.label}</span>言及SoV <b class="num">${s.toyota_sov}%</b> ／ 第一想起SoV <b class="num" style="color:var(--dn)">${s.toyota_fsov}%</b><br><span style="font-size:11px">${SEG_INSIGHT[s.seg]||''}</span></div>`).join('')+`<button class="jump" data-jump="seg">→ 車型別で見る</button>`);
+ }
+ if(kind==='cite'){
+  openModal('公式引用の対決', `<p>引用${fx(a.total)}件のうち、トヨタ公式は<b class="num">${a.own}件</b>、競合5社の公式は<b class="num" style="color:var(--dn)">${a.comp}件</b>。</p>${citeBar(a)}<button class="jump" data-jump="cite">→ 引用元で見る</button>`);
+ }
+ if(kind==='redir'){ help('cite') }
+ if(kind==='kat'){
+  const ks=DATA.funnel.filter(f=>f.katarare<70);
+  openModal('語られ指数 70未満', ks.map(f=>`<div class="def"><span class="dh">${esc(f.name)}</span>語られ指数 <b class="num" style="color:var(--dn)">${f.katarare}</b> ＝ AI言及シェア${f.ai_share}% ÷ 販売シェア${f.sales_share}%。月販<b class="num">${fx(f.sales_m)}</b>台。</div>`).join('')+`<div class="def"><span class="dh">DEFINITION</span>${HELP.katarare.d}</div>`);
+ }
+ if(kind==='round'){
+  openModal('計測の概要と規律', `<div class="def"><span class="dh">ROUND ${DATA.built}</span>${DATA.kpi.prompts}クエリ × 4AI面 ＝ 1,507セル（車種計測 ${fx(DATA.kpi.cells)}セル）。全回答本文と引用${fx(a.total)}件を保存。1周$38。</div><div class="def"><span class="dh">RULE</span>${HELP.rule.d}</div>`);
+ }
+}
+function fcell(f,key,isB){
+ const v=f[key];
+ const w=Math.min(v,200)/200*100;
+ let pass='';
+ if(key==='f2'&&f.target_cells>0) pass=`<span class="pass">通過${Math.round(f.mention/f.target_cells*100)}%</span>`;
+ if(key==='f3'&&f.mention>0) pass=`<span class="pass">通過${Math.round(f.first/f.mention*100)}%</span>`;
+ return `<td class="clicky" data-car="${f.id}" data-fi="${key}"><div class="fcell ${isB?'bneck':''}" style="padding:3px 6px"><span class="fv" style="color:${v>=100?'var(--up)':v>=70?'var(--tx)':'var(--dn)'}">${v}</span>${pass}
+ <div class="fbar"><em></em><i style="width:${w}%;background:${v>=100?'#3FD98F':'#FF5C7A'};opacity:.75"></i></div></div></td>`;
+}
+function fboardRender(key){
+ const rows=[...DATA.funnel].sort((a,b)=> key==='name'? a.name.localeCompare(b.name,'ja') : (a[key]??0)-(b[key]??0));
+ if(['katarare','mr','f1','f2','f3','f4'].includes(key)) rows.reverse();
+ $('#fboard tbody').innerHTML = rows.map(f=>`<tr class="hov" data-car="${f.id}">
+  <td><span class="carcell">${carThumb(f.id,f.name,'toyota')}<span><span class="nm">${esc(f.name)}</span><br><span class="sg">${SEGL[f.seg]||''}</span></span></span></td>
+  ${fcell(f,'f1',f.bottleneck==='F1')}${fcell(f,'f2',f.bottleneck==='F2')}${fcell(f,'f3',f.bottleneck==='F3')}${fcell(f,'f4',f.bottleneck==='F4')}
+  <td><span class="bpill">${BNL[f.bottleneck]} = ${f.bv}</span></td>
+  <td>${trendChip(f.id)}</td>
+  <td class="clicky" data-car="${f.id}" data-fi="katarare"><span class="num" style="color:${f.katarare>=100?'var(--up)':'var(--dn)'};font-weight:700">${f.katarare}</span></td></tr>`).join('');
+ document.querySelectorAll('#fboard tbody tr').forEach(tr=>tr.addEventListener('click',()=>{curCar=tr.dataset.car;renderCAR();switchTab('car')}));
+ document.querySelectorAll('#fboard [data-fi]').forEach(td=>td.addEventListener('click',e=>{e.stopPropagation();showFunnelDetail(td.dataset.car, td.dataset.fi)}));
+}
+
+function showFunnelDetail(carId,key){
+ const f=DATA.funnel.find(x=>x.id===carId), sm=DATA.surfmat[carId], cm=DATA.catmat[carId];
+ if(key==='katarare'){
+  openModal(`${f.name} — 語られ指数 ${f.katarare}`, `<div class="def"><span class="dh">実測の分解</span>AI言及シェア <b class="num">${f.ai_share}%</b> ÷ 販売台数シェア <b class="num">${f.sales_share}%</b> × 100 ＝ <b class="num" style="color:${f.katarare>=100?'var(--up)':'var(--dn)'}">${f.katarare}</b><br>月販 <b class="num">${fx(f.sales_m)}</b>台（自販連・全軽自協 実数）</div><div class="def"><span class="dh">DEFINITION</span>${HELP.katarare.d}</div>`);
+  return;
+ }
+ const lab={f1:'露出機会',f2:'言及',f3:'第一想起',f4:'流入'}[key];
+ let detail='';
+ if(key==='f1') detail=`<div class="def"><span class="dh">この車の実測</span>回答生成率 <b class="num">${f.answered_rate}%</b> ／ 平均引用数 <b class="num">${f.avg_cites}</b>本/回答 ／ 対象 <b class="num">${f.target_cells}</b>セル</div>`;
+ if(key==='f2') detail=`<div class="def"><span class="dh">この車の実測</span>言及 <b class="num">${f.mention}</b> / 分母 <b class="num">${f.target_cells}</b>セル ＝ <b class="num">${f.mr}%</b></div>
+  <div class="def"><span class="dh">AI面別の言及率</span>${Object.entries(SUR).map(([s,l])=>`${l} <b class="num" style="color:${(sm[s].mr||0)<30?'var(--dn)':'var(--tx)'}">${sm[s].mr??'—'}%</b>`).join(' ／ ')}</div>
+  <div class="def"><span class="dh">カテゴリ別の言及率（穴=赤）</span>${Object.entries(DATA.cat_labels).map(([k,l])=>cm[k]&&cm[k].den?`${l} <b class="num" style="color:${cm[k].mr<30?'var(--dn)':'var(--tx)'}">${cm[k].mr}%</b>`:'').filter(Boolean).join(' ／ ')}</div>`;
+ if(key==='f3') detail=`<div class="def"><span class="dh">この車の実測</span>第一想起 <b class="num">${f.first}</b>回 ／ 言及${f.mention}回中 ＝ <b class="num">${f.fr}%</b></div>
+  <div class="def"><span class="dh">AI面別の第一想起率</span>${Object.entries(SUR).map(([s,l])=>`${l} <b class="num">${sm[s].fr??'—'}%</b>`).join(' ／ ')}</div>`;
+ if(key==='f4') detail=`<div class="def"><span class="dh">この車の実測</span>GA4 28日 <b class="num">${fx(f.ga28)}</b> sess ／ GAシェア <b class="num">${DATA.ga.find(g=>g.id===carId).ga_share}%</b>（AI言及シェア ${f.ai_share}%）</div>`;
+ openModal(`${f.name} — ${lab}（指数 ${f[key]}）`, `${detail}<div class="def"><span class="dh">DEFINITION</span>${HELP[key].d}</div><button class="jump" data-jump="car">→ 車種オペレーションで深掘り</button>`);
+ const jb=$('#mbody .jump'); if(jb) jb.addEventListener('click',()=>{curCar=carId;renderCAR()});
+}
+
+/* ================= 02 車種オペレーション ================= */
+let curCar='raize';
+const BOTTLE_TXT = {
+ F1:'回答は生成されるが、引用の厚みが取れていない（露出機会の問題）',
+ F2:'そもそも候補リストに挙がらない（露出の問題）。比較記事・FAQの供給が先',
+ F3:'言及はされるのに最初に書かれない（語順の問題）。使い分け文脈の明示で動かせる',
+ F4:'AIに語られても toyota.jp へ流れていない（受け皿の問題）。回答内の引用リンク獲得が先',
+};
+function renderCAR(){
+ const f = DATA.funnel.find(x=>x.id===curCar);
+ const rank = [...DATA.funnel].sort((a,b)=>b.mr-a.mr).findIndex(x=>x.id===curCar)+1;
+ const frank = [...DATA.funnel].sort((a,b)=>b.fr-a.fr).findIndex(x=>x.id===curCar)+1;
+ const cm = DATA.catmat[curCar], sm = DATA.surfmat[curCar], vc = DATA.vocab[curCar], ci = DATA.cite.car[curCar];
+ const conv = convOf(curCar);
+ let h = `<div class="sec" style="margin-top:4px"><h2>車種別</h2><div class="ln"></div><span class="tag">分母=出現期待クエリ（指名除外）</span></div>
+ <div class="carsel">${DATA.funnel.map(x=>`<button class="cs ${x.id===curCar?'on':''}" data-car="${x.id}">${IMG[x.id]?`<img src="${IMG[x.id]}" alt="">`:''}<span>${esc(x.name)}</span></button>`).join('')}</div>
+ <div class="carhead">
+  <div class="carimgbig">${carThumb(curCar,f.name,'toyota',true)}</div>
+  <div><div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap"><span style="font-size:23px;font-weight:700">${esc(f.name)}</span><span class="chip">${SEGL[f.seg]}</span><span class="bpill">弱点: ${BNL[f.bottleneck]}（指数${f.bv}）</span><span style="margin-left:auto">${trendChip(curCar)}</span></div>
+  <div class="statchips">
+   <div class="sc"><div class="v num">${f.mr}<small>%</small></div><div class="l">言及率（${rank}/8位）</div></div>
+   <div class="sc"><div class="v num">${f.fr}<small>%</small></div><div class="l">第一想起率（${frank}/8位）</div></div>
+   <div class="sc"><div class="v num" style="color:${f.pos_rate>=25?'var(--up)':'var(--tx)'}">${f.pos_rate??'—'}<small>%</small></div><div class="l">好意的言及率 <span class="qmark" role="button" tabindex="0" data-help="pos">?</span></div></div>
+   <div class="sc"><div class="v num" style="color:${f.katarare>=100?'var(--up)':'var(--dn)'}">${f.katarare}</div><div class="l">語られ指数</div></div>
+   <div class="sc"><div class="v num" style="color:${conv>=100?'var(--up)':'var(--dn)'}">${conv??'—'}</div><div class="l">AI→流入変換 <span class="qmark" role="button" tabindex="0" data-help="conv">?</span></div></div>
+   <div class="sc"><div class="v num">${fx(f.ga28)}</div><div class="l">GA4 28日 sess</div></div>
+  </div>
+  <div class="insight warnb" style="margin-top:10px"><span class="h">BOTTLENECK</span><b>${BNL[f.bottleneck]}（指数${f.bv}）が最深。</b>${BOTTLE_TXT[f.bottleneck]}</div>
+  </div>
+ </div>
+ <div class="grid c2">
+  <div class="card"><h3>ファネル — どこで落ちているか ${qm('rule')}</h3><div class="sub">8車種平均=100の指数。<b>行クリックで内訳</b></div>
+   ${['f1','f2','f3','f4'].map((k,i)=>{
+    const v=f[k], lab=['露出機会','言及','第一想起','toyota.jp流入'][i], isB=f.bottleneck==='F'+(i+1);
+    const w=Math.min(v,200)/200*100;
+    return `<div class="clicky" data-fk="${k}" style="display:grid;grid-template-columns:110px 1fr 44px;gap:10px;align-items:center;margin:9px 0">
+     <span style="font-size:11px;color:${isB?'var(--dn)':'var(--mu)'};text-align:right;font-weight:${isB?700:400}">${lab}</span>
+     <div style="height:10px;border-radius:5px;background:var(--hl);position:relative;${isB?'box-shadow:0 0 0 1.5px var(--dn)':''}">
+      <i style="position:absolute;left:0;top:0;bottom:0;width:${w}%;border-radius:5px;background:${v>=100?'var(--up)':'var(--dn)'};opacity:.8"></i>
+      <i style="position:absolute;left:50%;top:-3px;bottom:-3px;width:1px;background:var(--hl2)"></i></div>
+     <span class="num" style="font-weight:700;color:${v>=100?'var(--up)':'var(--dn)'}">${v}</span></div>`}).join('')}
+   <div class="note">露出機会=回答生成率×引用数 ／ 言及=出現期待クエリでの登場率 ／ 第一想起=最初に書かれた率 ／ 流入=GA4実測</div>
+   <div class="card" style="margin-top:12px;padding:12px 14px"><h3 style="margin-bottom:2px">得意・不得意レーダー — ${esc(f.name)} vs ${esc((DATA.segs.find(s=>s.seg===f.seg).rows.find(r=>r.id===DATA.rival_of[curCar])||{}).name||'競合')} ${qm('radar')}</h3>
+   <div class="sub">カテゴリ別。<span id="rmode-l"></span>切替 →
+    <button class="dtab on" id="rm-mr" style="padding:2px 10px;font-size:9.5px">言及率</button>
+    <button class="dtab" id="rm-fr" style="padding:2px 10px;font-size:9.5px">推奨度（首位率）</button></div>
+   <div id="radarwrap"></div></div>
+  </div>
+  <div class="card"><h3>質問インテル — 何を聞かれ、どこに出ていないか ${qm('quest')}</h3><div class="sub">カテゴリ別の言及率（実測）。<b>穴=投資先。行クリックで実際の質問一覧</b></div>
+   ${Object.entries(DATA.cat_labels).map(([k,lab])=>{
+    const c=cm[k]; if(!c||!c.den) return '';
+    const v=c.mr, low=v<30;
+    return `<div class="axbar clicky" data-cat="${k}"><span class="lab" style="color:${low?'var(--dn)':'var(--mu)'};font-weight:${low?700:400}">${lab}</span>
+     <div class="bar"><i style="width:${v}%;background:${low?'var(--dn)':'var(--ac)'}"></i></div>
+     <span class="val">${v}%<span style="color:var(--fa);font-size:9px"> /${c.den}問</span></span></div>`}).join('')}
+   <div class="card" style="margin-top:11px;padding:12px 14px"><h3 style="margin-bottom:6px">AI面別 ${qm('surf')}</h3>
+   <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">${Object.entries(SUR).map(([s,lab])=>{
+    const v=sm[s]; const best=Math.max(...Object.values(sm).map(x=>x.mr||0))===v.mr;
+    return `<div style="background:var(--sf2);border:1px solid ${best?'rgba(108,158,255,.5)':'var(--hl)'};border-radius:10px;padding:8px 10px">
+     <div style="font-size:9.5px;color:var(--fa)">${lab}</div>
+     <div class="num" style="font-size:17px;font-weight:800;color:${(v.mr||0)<30?'var(--dn)':'var(--tx)'}">${v.mr??'—'}<small style="font-size:9px;color:var(--fa)">%</small></div>
+     <div style="font-size:9px;color:var(--fa)">首位 <b class="num" style="color:var(--mu)">${v.fr??'—'}%</b></div></div>`}).join('')}
+   </div></div>
+   <div class="card" style="margin-top:11px;padding:12px 14px"><h3 style="margin-bottom:6px">語られ方プロファイル ${qm('vocab')}</h3>
+   ${DATA.axes.map(ax=>{
+    const v=vc.axes[ax]||0, low=v<25;
+    return `<div class="axbar"><span class="lab" style="color:${low?'var(--dn)':'var(--mu)'}">${ax}</span>
+     <div class="bar"><i style="width:${v}%;background:${low?'var(--dn)':'#5B87E0'}"></i></div><span class="val">${v}%</span></div>`}).join('')}
+   </div>
+  </div>
+ </div>
+ <div class="card" style="margin-top:14px"><h3>この車の質問での引用元 ${qm('cite')}</h3>
+  ${citeBar(ci)}
+  <div class="insight" style="margin-top:10px"><span class="h">READ</span>${ci.own>ci.comp?`トヨタ公式 <b class="num">${ci.own}</b> ＞ 競合公式 <b class="num">${ci.comp}</b>。`:`競合公式 <b class="num" style="color:var(--dn)">${ci.comp}</b> ＞ トヨタ公式 <b class="num">${ci.own}</b>。`}販売店 ${ci.dealer}件。引用の${Math.round(100*ci.redir/ci.total)}%は発信元不明。</div>
+ </div>
+ <div class="card" style="margin-top:14px"><h3>対象クエリ — 実際に聞かれている質問</h3><div class="sub">
+  <button class="dtab on" id="qf-open" style="padding:3px 12px;font-size:10px">車名なしの質問のみ（${DATA.queries[curCar].filter(q=>!q.named).length}本）</button>
+  <button class="dtab" id="qf-all" style="padding:3px 12px;font-size:10px">指名込み全${DATA.queries[curCar].length}本</button>
+  　<b>行クリックで4面の回答・引用・競合の出方</b></div>
+ <div class="tw"><table class="t" id="qtable"><thead><tr><th data-k="t">質問（プロンプト全文）</th><th data-k="cat">カテゴリ</th><th data-k="m">言及</th><th data-k="f">首位獲得</th><th data-k="vol">月間検索Vol</th><th data-k="win">今の勝者</th><th></th></tr></thead><tbody></tbody></table></div></div>`;
+ $('#v-car').innerHTML = h;
+ document.querySelectorAll('#v-car .cs').forEach(b=>b.addEventListener('click',()=>{curCar=b.dataset.car;renderCAR()}));
+ qFilter='open';
+ qtableRender('m');
+ document.querySelectorAll('#qtable th').forEach(th=>th.addEventListener('click',()=>qtableRender(th.dataset.k)));
+ $('#qf-open').addEventListener('click',()=>{qFilter='open';$('#qf-open').classList.add('on');$('#qf-all').classList.remove('on');qtableRender('m')});
+ $('#qf-all').addEventListener('click',()=>{qFilter='all';$('#qf-all').classList.add('on');$('#qf-open').classList.remove('on');qtableRender('m')});
+ bindHelp('#v-car');
+ document.querySelectorAll('#v-car [data-fk]').forEach(el=>el.addEventListener('click',()=>showFunnelDetail(curCar, el.dataset.fk)));
+ document.querySelectorAll('#v-car [data-cat]').forEach(el=>el.addEventListener('click',()=>showCatQueries(curCar, el.dataset.cat)));
+ radarMode='mr'; renderRadar();
+ $('#rm-mr').addEventListener('click',()=>{radarMode='mr';$('#rm-mr').classList.add('on');$('#rm-fr').classList.remove('on');renderRadar()});
+ $('#rm-fr').addEventListener('click',()=>{radarMode='fr';$('#rm-fr').classList.add('on');$('#rm-mr').classList.remove('on');renderRadar()});
+}
+let radarMode='mr', qFilter='open';
+function renderRadar(){
+ const f = DATA.funnel.find(x=>x.id===curCar);
+ const sc = DATA.segcat[f.seg]||{};
+ const riv = DATA.rival_of[curCar];
+ const rivName = riv ? ((DATA.segs.find(s=>s.seg===f.seg).rows.find(r=>r.id===riv)||{}).name||riv) : null;
+ const keys = Object.keys(DATA.cat_labels).filter(k=>sc[k] && Object.values(sc[k]).some(v=>v.den>2));
+ const val = (car,k)=>{const v=(sc[k]||{})[car]; if(!v) return null; return radarMode==='mr'? v.mr : v.fr};
+ const series=[{label:f.name,color:'#6C9EFF',values:keys.map(k=>val(curCar,k))}];
+ if(riv) series.push({label:rivName,color:'#C4515C',values:keys.map(k=>val(riv,k))});
+ $('#radarwrap').innerHTML = radarSvg(keys, series, 380) + `<div class="legend" style="justify-content:center">${series.map(s=>`<span><i style="background:${s.color}"></i>${esc(s.label)}</span>`).join('')}<span style="color:var(--fa)">${radarMode==='mr'?'言及率（車型セル分母）':'推奨度=言及時に最初に挙がった率'}</span></div>`;
+}
+function radarSvg(keys, series, size){
+ const cx=size/2, cy=size/2, R=size/2-46, N=keys.length;
+ const ang=i=>-Math.PI/2 + i*2*Math.PI/N;
+ const pt=(i,r)=>[cx+Math.cos(ang(i))*r, cy+Math.sin(ang(i))*r];
+ let s=svgOpen(size,size);
+ for(const g of [25,50,75,100]){
+  s+=`<polygon points="${keys.map((_,i)=>pt(i,R*g/100).join(',')).join(' ')}" fill="none" stroke="#1B1F27"/>`;
+ }
+ s+=`<text x="${cx+4}" y="${cy-R-4}" fill="#3A4353" font-size="8.5" font-family="JetBrains Mono">100%</text>`;
+ keys.forEach((k,i)=>{
+  const [x,y]=pt(i,R); s+=`<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="#1B1F27"/>`;
+  const [lx,ly]=pt(i,R+26);
+  s+=`<text x="${lx}" y="${ly+3}" text-anchor="middle" fill="#98A2B3" font-size="10">${DATA.cat_labels[k]}</text>`;
+ });
+ for(const sr of series){
+  const pts=keys.map((k,i)=>pt(i,R*Math.min(sr.values[i]??0,100)/100).join(',')).join(' ');
+  s+=`<polygon points="${pts}" fill="${sr.color}" fill-opacity="0.13" stroke="${sr.color}" stroke-width="2"/>`;
+  keys.forEach((k,i)=>{const [x,y]=pt(i,R*Math.min(sr.values[i]??0,100)/100);s+=`<circle cx="${x}" cy="${y}" r="2.5" fill="${sr.color}"/>`});
+ }
+ return s+'</svg>';
+}
+function citeBar(ci){
+ const total=ci.total||1;
+ const segs=[['トヨタ公式',ci.own,'#6C9EFF'],['競合公式',ci.comp,'#C4515C'],['販売店',ci.dealer,'#3FD98F'],['メディア他（実URL判明）',Math.max(total-ci.own-ci.comp-ci.dealer-ci.redir,0),'#8A93A6'],['発信元不明（リダイレクタ）',ci.redir,'#232833']];
+ let bar='<div style="display:flex;height:22px;border-radius:7px;overflow:hidden;border:1px solid var(--hl2)">';
+ for(const [lab,v,c] of segs){const w=100*v/total; if(w>0) bar+=`<div title="${lab} ${v}" style="width:${w}%;background:${c}"></div>`}
+ bar+='</div><div class="legend">'+segs.map(([lab,v,c])=>`<span><i style="background:${c}"></i>${lab} <b class="num" style="color:var(--mu)">${fx(v)}</b></span>`).join('')+'</div>';
+ return bar;
+}
+function qtableRender(key){
+ let qs=[...DATA.queries[curCar]];
+ if(qFilter==='open') qs=qs.filter(q=>!q.named);
+ qs.sort((a,b)=>{
+  if(key==='t') return a.t.localeCompare(b.t,'ja');
+  if(key==='cat') return String(a.cat).localeCompare(String(b.cat),'ja');
+  if(key==='win') return String(b.win?b.win[0]:'').localeCompare(String(a.win?a.win[0]:''),'ja');
+  return (b[key]??0)-(a[key]??0);
+ });
+ $('#qtable tbody').innerHTML = qs.map(q=>{
+  const dots='<span class="dotset">'+[0,1,2,3].map(i=>i<q.m?'<b>●</b>':'<s>●</s>').join('')+'</span>';
+  const win=q.win?`${esc(q.win[0])} <span style="color:var(--fa)">×${q.win[1]}</span>`:'—';
+  return `<tr class="hov" data-pid="${q.id}"><td style="white-space:normal;min-width:340px;line-height:1.6">${esc(q.t)}${q.named?' <span class="chip">指名</span>':''}</td>
+  <td><span class="chip">${esc(q.cat)}</span></td><td>${dots} <span class="num" style="color:var(--fa)">${q.m}/4</span></td>
+  <td class="num" style="color:${q.f>0?'var(--up)':'var(--fa)'}">${q.f>0?q.f+'面':'—'}</td><td class="num" style="color:${q.vol?'var(--tx)':'var(--fa)'}">${q.vol?fx(q.vol):'—'}</td><td style="font-size:11px">${win}</td><td style="text-align:right"><span class="jump" style="padding:3px 10px;font-size:10px;white-space:nowrap">4面詳細 ›</span></td></tr>`;
+ }).join('');
+ document.querySelectorAll('#qtable tbody tr').forEach(tr=>tr.addEventListener('click',()=>showQueryDetail(tr.dataset.pid)));
+}
+function showQueryDetail(pid){
+ const d=DATA.qdetail[pid];
+ if(!d){openModal('クエリ '+pid,'<p style="color:var(--fa)">詳細データなし</p>');return}
+ const catl=DATA.cat_labels[d.cat]||'—';
+ let h=`<div style="font-size:10px;color:var(--fa);margin-bottom:10px;font-family:var(--mono)">${pid} ／ カテゴリ: ${catl} ／ 車型: ${SEGL[d.seg]||d.seg||'—'} ／ ${d.named&&d.named.length?'指名クエリ':'車名なしの質問'}</div>`;
+ for(const [sk,lab] of Object.entries(SUR)){
+  const v=d.s[sk];
+  if(!v){h+=`<div class="def"><span class="dh">${lab}</span><span style="color:var(--fa)">回答なし</span></div>`;continue}
+  h+=`<div class="def"><span class="dh">${lab} — AIが挙げた候補</span>
+   <div class="order" style="margin:5px 0 8px">${v.o.length? v.o.map(o=>`<span class="oc ${o.b==='toyota'?'own':''}" style="${o.x?'opacity:.4':''}">${o.r}位 ${esc(o.n)}${o.x?'（指名）':''}${o.st==='positive'?' +':''}</span>`).join('') : '<span class="oc">検出車種なし</span>'}</div>
+   <div style="font-size:11.5px;color:#B9C2D0;line-height:1.85;margin-bottom:7px">${esc(v.a||'')}</div>
+   ${(v.c||[]).map(c=>`<div class="ci"><span class="bk">${esc(c.b||'—')}</span><a href="${esc(c.u||'#')}" target="_blank" rel="noopener">${esc(c.t||c.h||'')}</a></div>`).join('')||'<span style="font-size:10px;color:var(--fa)">引用なし</span>'}
+  </div>`;
+ }
+ const fullCar = Object.keys(DATA.drawer||{}).find(c=>(DATA.drawer[c]||[]).some(x=>x.pid===pid));
+ h+=`<div class="note">冒頭260字の抜粋（全文は本番実装で全クエリに接続）。順位は検出順位、（指名）=質問文に車名が含まれる車。</div>`;
+ if(fullCar) h+=`<button class="jump" id="fulldrawer">この質問の回答全文を読む（4面・同梱分）</button>`;
+ openModal(d.q||pid, h);
+ if(fullCar){const b=$('#fulldrawer'); if(b) b.addEventListener('click',()=>{closeModal();openDrawer(fullCar,pid)});}
+}
+
+function showCatQueries(carId, catKey){
+ const lab = DATA.cat_labels[catKey];
+ const f = DATA.funnel.find(x=>x.id===carId);
+ const qs = DATA.queries[carId].filter(q=>q.cat===lab && !q.named);
+ const cm = DATA.catmat[carId][catKey]||{};
+ openModal(`${f.name} × ${lab} — 実際の質問 ${qs.length}本`, `
+ <p>このカテゴリの出現期待セルでの言及率は <b class="num" style="color:${(cm.mr||0)<30?'var(--dn)':'var(--tx)'}">${cm.mr??'—'}%</b>（${cm.m??'—'}/${cm.den??'—'}セル）。</p>
+ <div class="tw"><table class="t"><thead><tr><th>質問（プロンプト全文）</th><th>言及</th><th>今の勝者</th><th></th></tr></thead><tbody>
+ ${qs.map(q=>`<tr class="hov qdrow" data-pid="${q.id}"><td style="white-space:normal;line-height:1.6;font-size:11.5px">${esc(q.t)}</td>
+  <td><span class="dotset">${[0,1,2,3].map(i=>i<q.m?'<b>●</b>':'<s>●</s>').join('')}</span></td>
+  <td style="font-size:11px;white-space:nowrap">${q.win?esc(q.win[0]):'—'}</td><td style="text-align:right"><span class="jump" style="padding:3px 10px;font-size:10px;white-space:nowrap">4面詳細 ›</span></td></tr>`).join('') || '<tr><td colspan="4" style="color:var(--fa)">非指名クエリなし</td></tr>'}
+ </tbody></table></div>`);
+ document.querySelectorAll('#mbody .qdrow').forEach(tr=>tr.addEventListener('click',()=>showQueryDetail(tr.dataset.pid)));
+}
+/* ================= 03 車型ウォーズ ================= */
+let curSeg='compact_tall';
+const SEG_INSIGHT = {
+ compact_tall:'ルーミー単体の言及率61.2%は車型内トップ。しかしトヨタとしての言及SoVは26.9%、第一想起SoVは11.0%。回答の主語をソリオ・トール・デリカミニに握られており、8車種の中で最も深い穴。',
+ minivan_s:'シエンタの言及率87.5%は全車型を通じて最高＝露出は圧倒的。それでも第一想起SoVは31.6%で、「まずフリード」と書かれてから並記される回答が多い。露出でなく語順の問題。',
+ minivan_m:'セレナ・ステップワゴンと三つ巴。言及SoV48.1%・第一想起SoV44.9%で拮抗。ノア/ヴォクシーの2枚看板をAIがどちらの名前で代表させるかで、社内の第一想起が割れている。',
+ minivan_l:'トヨタの牙城。言及SoV85.2%・第一想起SoV81.1%。攻めでなく維持（情報鮮度と誤情報監視）に切り替えてよい車型。',
+ compact_hb:'言及SoVは50.4%と接戦に見えるが、第一想起SoVは61.9%。アクア＋ヤリスの2枚看板が効いており、敵は他社よりも社内の食い合い。',
+ suv_compact:'ライズが言及61.1%・第一想起SoV57.4%でトップ。ただし密度1.71＝1回答に1〜2台しか挙がらないゼロサム戦場で、候補から落ちる＝完全不在。',
+ suv_off:'単体トップはジムニー/シエラ（34.7%）で「本格オフロード」の文脈を握られている。トヨタはランクル4車＋RAV4の合算で言及SoV58.8%を確保している構図。',
+};
+function renderSEG(){
+ const s = DATA.segs.find(x=>x.seg===curSeg);
+ let h = `<div class="sec" style="margin-top:4px"><h2>車型ウォーズ — トヨタのGEO得意・不得意</h2><div class="ln"></div><span class="tag">${s.cells} CELLS ／ 分母=当該車型の非指名セル</span></div>
+ <div class="segrowx">${DATA.segs.map(x=>{
+  const [col]=segState(x);
+  return `<button class="cs" style="flex-direction:column;align-items:flex-start;gap:2px;padding:10px 12px;${x.seg===curSeg?'border-color:var(--ac);background:var(--sf2)':''}" data-seg="${x.seg}">
+  <span style="display:flex;align-items:center;gap:6px;font-size:10.5px;font-weight:700"><i style="width:7px;height:7px;border-radius:50%;background:${col};display:inline-block"></i>${x.label}</span>
+  <span class="num" style="font-size:18px;font-weight:800;color:${(x.toyota_sov+x.toyota_fsov)/2>=60?'var(--up)':(x.toyota_sov+x.toyota_fsov)/2>=40?'var(--wa)':'var(--dn)'}">${Math.round((x.toyota_sov+x.toyota_fsov)/2)}<small style="font-size:8.5px;color:var(--fa)"> GEO</small></span>
+  <span style="font-size:9px;color:var(--fa)">言及${x.toyota_sov}% ／ 首位${x.toyota_fsov}%</span></button>`}).join('')}
+ </div>
+ <div class="grid c32">
+  <div class="card"><h3>${s.label} — 車種別 言及率（トヨタ vs 競合実測） ${qm('sov')}</h3><div class="sub">その車が指名されていないセルで回答に登場した率</div>
+  ${s.rows.map(r=>{
+   const w=Math.max(r.mr/Math.max(...s.rows.map(x=>x.mr),1)*100,1);
+   return `<div style="display:grid;grid-template-columns:200px 1fr 52px;gap:10px;align-items:center;margin:7px 0">
+    <span class="carcell">${carThumb(r.id,r.name,r.brand)}<span><span class="nm" style="color:${r.brand==='toyota'?'var(--tx)':'var(--mu)'}">${esc(r.name)}</span><br><span class="sg">${BN[r.brand]}</span></span></span>
+    <div style="height:16px;border-radius:5px;background:var(--hl);position:relative"><i style="position:absolute;left:0;top:0;bottom:0;width:${w}%;border-radius:5px;background:${r.brand==='toyota'?'var(--ac)':'#39404D'};opacity:${r.brand==='toyota'?.95:.9}"></i></div>
+    <span class="num" style="font-weight:700">${r.mr}%</span></div>`}).join('')}
+  <div class="insight" style="margin-top:12px"><span class="h">READ</span>${SEG_INSIGHT[s.seg]}</div>
+  </div>
+  <div><div class="card"><h3>第一想起の奪い合い ${qm('fsov')}</h3><div class="sub">最初に書かれた車のシェア（合計100%＝${s.first_total}回答）</div>${firstStack(s)}
+   <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--hl);border:1px solid var(--hl);border-radius:10px;overflow:hidden;margin-top:14px">
+    <div class="hs"><div class="v num" style="font-size:17px">${s.density}</div><div class="l">候補密度/回答</div></div>
+    <div class="hs"><div class="v num" style="font-size:17px">${s.toyota_fsov}<small>%</small></div><div class="l">トヨタ第一想起SoV</div></div>
+    <div class="hs"><div class="v num" style="font-size:17px">${s.answered_rate}<small>%</small></div><div class="l">回答生成率</div></div>
+   </div></div>
+   <div class="card" style="margin-top:12px"><h3>出現しやすい車型・しにくい車型 ${qm('density')}</h3><div class="sub">1回答あたり候補数（全車型実測）。低い=ゼロサム</div>${densityChart()}</div>
+  </div>
+ </div>
+ <div class="card" style="margin-top:14px"><h3>${s.label} — 車種別トレンド（31日・7日移動平均） ${qm('trend')}</h3><div class="sub">この車型の中で誰が伸びているか。<b>青=トヨタ／グレー=競合</b>、右端ラベルは直近14日vs前14日</div>
+ ${(()=>{
+  const cars=s.rows.map(r=>({...r,o:DATA.ovtrend.find(x=>x.id===r.id)})).filter(r=>r.o);
+  if(!cars.length) return '<div class="note">系列なし</div>';
+  const W=1120,H=230,P={l:40,r:150,t:14,b:26};
+  const mas=cars.map(c=>({...c,m:ma7(c.o.series),tr:trendOfSeries(c.o.series)}));
+  const mx=Math.max(...mas.flatMap(c=>c.m),1);
+  const X=i=>P.l+i/30*(W-P.l-P.r), Y=v=>H-P.b-(v/mx)*(H-P.t-P.b);
+  let out=svgOpen(W,H);
+  [0.5,1].forEach(f=>{out+=`<line class="gline" x1="${P.l}" y1="${Y(mx*f)}" x2="${W-P.r}" y2="${Y(mx*f)}"/>`});
+  DATA.days.forEach((d,i)=>{if(i%5===0)out+=`<text x="${X(i)}" y="${H-8}" text-anchor="middle" fill="#545E70" font-size="8.5" font-family="JetBrains Mono">${d.slice(5)}</text>`});
+  const placed=[];
+  for(const c of mas){
+   const col=c.brand==='toyota'?'#6C9EFF':'#5A6478';
+   out+=`<polyline points="${c.m.map((v,i)=>X(i)+','+Y(v)).join(' ')}" fill="none" stroke="${col}" stroke-width="${c.brand==='toyota'?2.4:1.6}" opacity="${c.brand==='toyota'?1:.85}"/>`;
+   let ly=Y(c.m[c.m.length-1]);
+   while(placed.some(p=>Math.abs(p-ly)<14)) ly+=14;
+   placed.push(ly);
+   const pc=c.tr.pct; const pcol=pc>=8?'var(--up)':pc<=-8?'var(--dn)':'var(--fa)';
+   out+=`<text x="${W-P.r+8}" y="${ly+3}" fill="${c.brand==='toyota'?'#C7CFDC':'#7A8496'}" font-size="10.5">${esc(c.name)} <tspan fill="${pcol==='var(--up)'?'#3FD98F':pcol==='var(--dn)'?'#FF5C7A':'#545E70'}" font-family="JetBrains Mono" font-weight="700">${pc!=null?(pc>0?'+':'')+pc+'%':''}</tspan></text>`;
+  }
+  return out+'</svg>';
+ })()}</div>
+ <div class="sec"><h2>兄弟車・OEMの共食い — AIはどちらの名前で語るか</h2><div class="ln"></div><span class="tag">同一回答内の共起実測</span></div>
+ <div class="grid c3">${Object.values(DATA.oem).map(o=>{
+  const tot=o.both+o.onlya+o.onlyb;
+  return `<div class="card"><h3>${o.a} × ${o.b}</h3><div class="sub">${o.note}</div>
+  <div style="display:flex;height:20px;border-radius:6px;overflow:hidden;border:1px solid var(--hl2)">
+   <div style="width:${100*o.onlya/tot}%;background:var(--ac)"></div>
+   <div style="width:${100*o.both/tot}%;background:#39404D"></div>
+   <div style="width:${100*o.onlyb/tot}%;background:#C4515C"></div></div>
+  <div class="legend"><span><i style="background:var(--ac)"></i>${o.a}だけ <b class="num">${o.onlya}</b></span><span><i style="background:#39404D"></i>両方 <b class="num">${o.both}</b></span><span><i style="background:#C4515C"></i>${o.b}だけ <b class="num">${o.onlyb}</b></span></div>
+  <p style="font-size:11px;color:var(--mu);margin-top:9px;line-height:1.7">${o.onlyb>o.onlya?`単独露出は<b style="color:var(--tx)">${o.b}が${o.onlya?Math.round(o.onlyb/Math.max(o.onlya,1)*10)/10:o.onlyb}倍</b>。AIはこの枠を${o.b}の名前で代表させがち。`:o.onlyb===0?`<b style="color:var(--tx)">${o.b}の単独露出はゼロ</b>。この枠は完全に${o.a}の名前で語られている。`:`単独露出は${o.a}が優位（${o.onlya} vs ${o.onlyb}）。`}</p></div>`}).join('')}
+ </div>`;
+ $('#v-seg').innerHTML=h;
+ document.querySelectorAll('#v-seg [data-seg]').forEach(b=>b.addEventListener('click',()=>{curSeg=b.dataset.seg;renderSEG()}));
+ bindHelp('#v-seg');
+}
+function firstStack(s){
+ const rows=[...s.rows].sort((a,b)=>b.fshare-a.fshare).filter(r=>r.fshare>0);
+ const W=430,H=48;let out=svgOpen(W,H);let x=0;
+ rows.forEach(r=>{
+  const w=r.fshare/100*W;
+  out+=`<rect x="${x}" y="6" width="${Math.max(w-1.5,1)}" height="20" rx="3" fill="${r.brand==='toyota'?'#6C9EFF':'#39404D'}"/>`;
+  if(w>40) out+=`<text x="${x+w/2}" y="43" text-anchor="middle" fill="#98A2B3" font-size="9.5">${esc(r.name)} ${r.fshare}%</text>`;
+  x+=w;
+ });
+ return out+'</svg>';
+}
+function densityChart(){
+ const rows=[...DATA.segs.map(s=>({label:s.label,d:s.density})),{label:'車型横断（比較質問）',d:DATA.cross.density,x:1}].sort((a,b)=>b.d-a.d);
+ const W=430,rH=25,H=rows.length*rH+8,maxd=Math.max(...rows.map(r=>r.d));
+ let s=svgOpen(W,H);
+ rows.forEach((r,i)=>{
+  const y=4+i*rH,w=(r.d/maxd)*(W-210);
+  s+=`<text x="140" y="${y+12}" text-anchor="end" fill="#98A2B3" font-size="10">${esc(r.label)}</text>`;
+  s+=`<rect x="148" y="${y}" width="${w}" height="13" rx="3" fill="${r.x?'#545E70':'#6C9EFF'}" opacity="${r.x?0.7:0.85}"/>`;
+  s+=`<text x="${148+w+7}" y="${y+11}" fill="#F4F6FA" font-size="10" font-family="JetBrains Mono">${r.d.toFixed(2)}</text>`;
+ });
+ return s+'</svg>';
+}
+
+/* ================= 04 引用インテル ================= */
+function renderCITE(){
+ const a = DATA.cite.all;
+ const known = a.total - a.redir;
+ let h = `<div class="sec" style="margin-top:4px"><h2>引用インテル — AIの「教科書」を誰が握っているか</h2><div class="ln"></div><span class="tag">${fx(a.total)} 引用 ／ 2026-08-28 実測</span></div>
+ <div class="hstats" style="margin-bottom:14px">
+  <div class="hs"><div class="v num">${fx(a.total)}</div><div class="l">引用リンク総数</div><div class="d">1,280セルから回収</div></div>
+  <div class="hs"><div class="v num" style="color:var(--dn)">${Math.round(100*a.redir/a.total)}<small>%</small></div><div class="l">発信元不明（リダイレクタ）</div><div class="d">google.com/goto・vertexaisearch 経由</div></div>
+  <div class="hs"><div class="v num" style="color:var(--ac2)">${a.own}<small> vs ${a.comp}</small></div><div class="l">トヨタ公式 vs 競合公式</div><div class="d" style="color:var(--dn)">公式引用で競合に負けている</div></div>
+  <div class="hs"><div class="v num">${a.dealer}</div><div class="l">販売店サイトの引用</div><div class="d">公式でなく販社が根拠になる例</div></div>
+ </div>
+ <div class="card"><h3>引用の全体構成 ${qm('cite')}</h3><div class="sub">「トヨタのサイトは引用推奨されているか」への実測回答。SNS/UGCは分類上ほぼ検出されず（大半がリダイレクタで不明のため、少なく見えている可能性まで含めて「不明」を残す）</div>${citeBar(a)}</div>
+ <div class="grid c2" style="margin-top:14px">
+  <div class="card"><h3>実URLが判明した引用元 TOP（${fx(known)}件中）</h3><div class="sub">青=トヨタ公式 ／ 赤=競合公式</div>
+  <div class="tw"><table class="t"><thead><tr><th>ドメイン</th><th>引用数</th><th>種別</th></tr></thead><tbody>
+  ${a.top_hosts.map(([hst,n])=>{
+   const ty=['toyota.jp','global.toyota'].includes(hst), cp=['honda.co.jp','global.honda','www3.nissan.co.jp','www2.nissan.co.jp','suzuki.co.jp','daihatsu.co.jp','mitsubishi-motors.co.jp'].includes(hst);
+   const dl=hst.includes('toyota-mobi')||hst.includes('dealer');
+   return `<tr class="hov"><td class="num" style="color:${ty?'var(--ac2)':cp?'#E07B85':'var(--mu)'}">${esc(hst)}</td>
+   <td><div style="display:inline-block;width:${Math.min(n/a.top_hosts[0][1]*130,130)}px;height:9px;border-radius:3px;background:${ty?'var(--ac)':cp?'#C4515C':'#39404D'};vertical-align:middle;margin-right:8px"></div><span class="num">${n}</span></td>
+   <td><span class="chip ${ty?'ty':''}">${ty?'トヨタ公式':cp?'競合公式':dl?'販売店':'メディア/その他'}</span></td></tr>`}).join('')}
+  </tbody></table></div></div>
+  <div><div class="card"><h3>AI面別 — 公式が引かれる面・引かれない面</h3><div class="sub">面ごとの トヨタ公式／競合公式／不明 の引用数</div>
+  <div class="tw"><table class="t"><thead><tr><th>AI面</th><th>トヨタ公式</th><th>競合公式</th><th>総引用</th><th>不明率</th></tr></thead><tbody>
+  ${Object.entries(SUR).map(([sk,lab])=>{
+   const c=DATA.cite.surf[sk];
+   return `<tr class="hov"><td>${lab}</td><td class="num" style="color:var(--ac2);font-weight:700">${c.own}</td><td class="num" style="color:#E07B85;font-weight:700">${c.comp}</td><td class="num" style="color:var(--fa)">${fx(c.total)}</td><td class="num" style="color:var(--fa)">${Math.round(100*c.redir/Math.max(c.total,1))}%</td></tr>`}).join('')}
+  </tbody></table></div>
+  <div class="note">ChatGPTは引用が実URLで返るため公式判定が効く。Google系2面はリダイレクタ経由が大半で「不明」が支配的＝<b>この2面の引用実態はtitle復元（バックログ②）を実装するまで正確に語れない</b>。</div></div>
+  <div class="card" style="margin-top:12px"><h3>引用された toyota.jp のページ</h3><div class="sub">cited_car_pages 実測（件数／登場クエリ数）</div>
+  <div class="tw"><table class="t"><thead><tr><th>URL</th><th>引用</th><th>クエリ</th></tr></thead><tbody>
+  ${DATA.cite.pages.length? DATA.cite.pages.map(([u,n,q])=>`<tr class="hov"><td style="font-size:10.5px;max-width:300px;overflow:hidden;text-overflow:ellipsis"><a href="${esc(u)}" target="_blank" rel="noopener">${esc(u.replace('https://',''))}</a></td><td class="num">${n}</td><td class="num" style="color:var(--fa)">${q}</td></tr>`).join('') : '<tr><td colspan="3" style="color:var(--fa)">—</td></tr>'}
+  </tbody></table></div></div></div>
+ </div>
+ <div class="sec"><h2>引用元カタログ — どんなサイトがAIの根拠になっているか</h2><div class="ln"></div><span class="tag">実URL判明分 ／ ドメインクリックで実際の引用リンク</span></div>
+ <div class="grid c3">${['toyota','rival','dealer','media3rd','sns','wiki','other'].map(k=>{
+  const cc=DATA.citecatalog; const doms=(cc.domains[k]||[]);
+  if(!doms.length && !cc.counts[k]) return '';
+  const mx=doms.length?doms[0].n:1;
+  return `<div class="card" style="padding:13px 15px"><h3 style="display:flex;justify-content:space-between"><span>${cc.labels[k]}</span><span class="num" style="color:var(--fa);font-weight:400">${fx(cc.counts[k]||0)}件</span></h3>
+  ${doms.slice(0,5).map(d=>`<button class="axbar clicky domrow" data-k="${k}" data-h="${esc(d.h)}" style="width:100%;background:none;border:none;padding:0;grid-template-columns:130px 1fr 36px"><span class="lab" style="font-family:var(--mono);font-size:9px;overflow:hidden;text-overflow:ellipsis">${esc(d.h)}</span><div class="bar"><i style="width:${Math.min(100,100*d.n/mx)}%;background:#5B87E0"></i></div><span class="val">${d.n}</span></button>`).join('')||'<div class="note">実URLでの検出なし（大半がリダイレクタ内）</div>'}
+  </div>`}).join('')}
+ </div>
+ <div class="insight" style="margin-top:14px"><span class="h">SO WHAT</span><b>打ち手の優先順位はこの表から直接出る。</b>(1) 実URL判明分でトヨタ公式は最大勢力（toyota.jp ${a.top_hosts[0][1]}件）だが、車種の質問全体では公式引用率4.3%＝AIの根拠の95%以上を外部に依存。(2) 競合公式(402件)がトヨタ公式(381件)を上回っており、ホンダは車種数が少ないぶん1車種あたりの公式引用効率が高い。(3) 販売店サイト(${a.dealer}件)が公式の代わりに根拠として引かれている＝<b>toyota.jp側に「比較・価格・納期FAQ」の受け皿を作れば公式に引き戻せる余地</b>。(4) Google系2面の引用はtitle復元の実装（②）が先決。</div>`;
+ $('#v-cite').innerHTML=h;
+ bindHelp('#v-cite');
+ document.querySelectorAll('#v-cite .domrow').forEach(b=>b.addEventListener('click',()=>showDomain(b.dataset.k,b.dataset.h)));
+}
+function showDomain(k,h){
+ const cc=DATA.citecatalog;
+ const d=(cc.domains[k]||[]).find(x=>x.h===h);
+ if(!d){openModal(h,'<p style="color:var(--fa)">データなし</p>');return}
+ openModal(h+' — '+cc.labels[k]+'（引用 '+d.n+'件）', `
+ <p>このドメインがAIの回答に引用された実例。リンクで引用先を開ける。関連クエリからは4面の回答詳細へ。</p>
+ ${d.s.length? d.s.map(x=>`<div class="def"><a href="${esc(x.u)}" target="_blank" rel="noopener" style="font-size:12px">${esc(x.t)}</a><br>
+  <button class="jump qdlink" data-pid="${x.pid}" style="margin-top:7px;padding:4px 11px;font-size:10.5px">この引用が付いた質問を見る</button></div>`).join('') : '<p style="color:var(--fa)">タイトル付きサンプルなし（URLのみ検出）</p>'}`);
+ document.querySelectorAll('#mbody .qdlink').forEach(b=>b.addEventListener('click',()=>showQueryDetail(b.dataset.pid)));
+}
+
+/* ================= 05 GA × AI ================= */
+let curGA='raize';
+function renderGA(){
+ let h = `<div class="sec" style="margin-top:4px"><h2>GA × AI — 語られ方と流入の突き合わせ</h2><div class="ln"></div><span class="tag">GA4 直近28日実測（重点8車種）</span></div>
+ <div class="grid c32">
+ <div class="card"><h3>AI言及シェア × GA流入シェア</h3><div class="sub">x=AIの回答で言及されるシェア ／ y=toyota.jp車種ページのセッションシェア（8車種内）。対角線＝釣り合い。バブル径＝GA28日セッション</div>${gaScatter()}</div>
+ <div class="card"><h3>ズレの大きい順</h3><div class="sub">GAシェア − AIシェア。負＝<b>語られる割に来ていない</b></div>${gaGapChart()}
+ <div class="insight"><span class="h">READ</span><b>ヴォクシー・ノア（-4.4pt）はAI上の露出を流入に変換できていない</b>。シエンタ（+3.0pt）・アルファード（+3.1pt）は両立。ランクル250はAIシェア6.0%に対しGAシェア9.6%＝<b>語られていないのに来ている（指名・実店舗起点が強い）</b>で、AI側の伸び代が最も大きい。</div></div>
+ </div>
+ <div class="card" style="margin-top:14px"><h3>AI→流入変換指数 — 車種スコア ${qm('conv')}</h3><div class="sub">GAシェア ÷ AIシェア × 100。<b>各車種のスコアとして比較に使う</b>（100=釣り合い）</div>
+ ${[...DATA.funnel].map(f=>({f, c:convOf(f.id)})).sort((a,b)=>a.c-b.c).map(({f,c})=>{
+  const w=Math.min(c,200)/200*100;
+  return `<div style="display:grid;grid-template-columns:130px 1fr 46px;gap:10px;align-items:center;margin:6px 0">
+   <span style="font-size:11px;color:var(--mu);text-align:right">${esc(f.name)}</span>
+   <div style="height:9px;border-radius:4px;background:var(--hl);position:relative">
+    <i style="position:absolute;left:0;top:0;bottom:0;width:${w}%;border-radius:4px;background:${c>=100?'var(--up)':'var(--dn)'};opacity:.8"></i>
+    <i style="position:absolute;left:50%;top:-3px;bottom:-3px;width:1px;background:var(--hl2)"></i></div>
+   <span class="num" style="font-weight:700;color:${c>=100?'var(--up)':'var(--dn)'}">${c}</span></div>`}).join('')}
+ <div class="note">100未満＝AI上の露出が toyota.jp 流入に変換できていない（回答内の引用リンク獲得＝受け皿が課題）。</div></div>
+ <div class="card" style="margin-top:14px"><h3>日次トレンド — AI言及ヒット × GAセッション</h3><div class="sub">左軸: 日次スキャン(60クエリ)のAI言及ヒット（8/1〜8/31実測）／右軸: GA4セッション（28日実測）</div>
+ <div id="carchips" style="display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 14px"></div>
+ <div id="dualwrap"></div></div>`;
+ $('#v-ga').innerHTML = h;
+ $('#carchips').innerHTML = DATA.ga.map(g=>`<button class="dtab ${g.id===curGA?'on':''}" data-c="${g.id}">${esc(g.name)}</button>`).join('');
+ document.querySelectorAll('#carchips .dtab').forEach(b=>b.addEventListener('click',()=>{curGA=b.dataset.c;renderDual();document.querySelectorAll('#carchips .dtab').forEach(x=>x.classList.toggle('on',x.dataset.c===curGA))}));
+ renderDual();
+ document.querySelectorAll('#v-ga .gp').forEach(p=>{
+  const g = DATA.ga[+p.dataset.i];
+  bindTT(p,()=>`<b>${esc(g.name)}</b><br>AI言及シェア <span class="num">${g.ai_share}%</span> ／ GAシェア <span class="num">${g.ga_share}%</span><br>GA 28日 <span class="num">${fx(g.ga28)}</span> sess ／ 語られ指数 <span class="num">${g.katarare}</span>`);
+ });
+}
+function gaScatter(){
+ const W=640,H=430,P={l:56,r:26,t:26,b:46};
+ const xs=DATA.ga.map(g=>g.ai_share), ys=DATA.ga.map(g=>g.ga_share);
+ const mn=Math.min(...xs,...ys)-2, mx=Math.max(...xs,...ys)+2;
+ const X=v=>P.l+(v-mn)/(mx-mn)*(W-P.l-P.r), Y=v=>H-P.b-(v-mn)/(mx-mn)*(H-P.t-P.b);
+ let s=svgOpen(W,H);
+ for(let v=Math.ceil(mn/5)*5; v<=mx; v+=5){
+  s+=`<line class="gline" x1="${X(v)}" y1="${P.t}" x2="${X(v)}" y2="${H-P.b}"/><text x="${X(v)}" y="${H-P.b+16}" text-anchor="middle" fill="#545E70" font-size="9.5" font-family="JetBrains Mono">${v}%</text>`;
+  s+=`<line class="gline" x1="${P.l}" y1="${Y(v)}" x2="${W-P.r}" y2="${Y(v)}"/><text x="${P.l-8}" y="${Y(v)+3}" text-anchor="end" fill="#545E70" font-size="9.5" font-family="JetBrains Mono">${v}%</text>`;
+ }
+ s+=`<line x1="${X(mn)}" y1="${Y(mn)}" x2="${X(mx)}" y2="${Y(mx)}" stroke="#2A3140" stroke-width="1.4" stroke-dasharray="6 5"/>`;
+ s+=`<text x="${P.l+8}" y="${P.t+14}" fill="#98A2B3" font-size="10">↑ 語られる以上に来ている（指名が強い）</text>`;
+ s+=`<text x="${W-P.r-8}" y="${H-P.b-10}" text-anchor="end" fill="#98A2B3" font-size="10">語られるのに来ていない →</text>`;
+ const placed=[];
+ DATA.ga.forEach((g,i)=>{
+  const r = 7+Math.sqrt(g.ga28)/60;
+  const under = g.ga_share < g.ai_share;
+  s+=`<circle class="gp" data-i="${i}" cx="${X(g.ai_share)}" cy="${Y(g.ga_share)}" r="${r}" fill="${under?'#FF5C7A':'#6C9EFF'}" opacity="0.82" stroke="#0B0D11" stroke-width="1.5"/>`;
+  let lx=X(g.ai_share), ly=Y(g.ga_share)-r-5;
+  if(placed.some(p=>Math.abs(p[0]-lx)<64 && Math.abs(p[1]-ly)<13)) ly = Y(g.ga_share)+r+13;
+  if(placed.some(p=>Math.abs(p[0]-lx)<64 && Math.abs(p[1]-ly)<13)) ly += 13;
+  placed.push([lx,ly]);
+  s+=`<text x="${lx}" y="${ly}" text-anchor="middle" fill="#C7CFDC" font-size="10">${esc(g.name)}</text>`;
+ });
+ s+=`<text x="${(P.l+W-P.r)/2}" y="${H-8}" text-anchor="middle" fill="#545E70" font-size="10">AI言及シェア（8車種内）→</text>`;
+ return s+'</svg>';
+}
+function gaGapChart(){
+ const rows=[...DATA.ga].map(g=>({...g,gap:+(g.ga_share-g.ai_share).toFixed(1)})).sort((a,b)=>a.gap-b.gap);
+ const W=430,rH=28,H=rows.length*rH+30,mid=W*0.58,span=W*0.24,maxg=Math.max(...rows.map(r=>Math.abs(r.gap)),1);
+ let s=svgOpen(W,H);
+ s+=`<line x1="${mid}" y1="6" x2="${mid}" y2="${H-22}" stroke="#2A3140" stroke-width="1.2"/>`;
+ rows.forEach((r,i)=>{
+  const y=10+i*rH,dx=r.gap/maxg*span,x0=Math.min(mid,mid+dx);
+  s+=`<text x="${mid-span-10}" y="${y+11}" text-anchor="end" fill="#98A2B3" font-size="10">${esc(r.name)}</text>`;
+  s+=`<rect x="${x0}" y="${y}" width="${Math.max(Math.abs(dx),2)}" height="14" rx="3" fill="${r.gap<0?'#FF5C7A':'#3FD98F'}" opacity="0.8"/>`;
+  const lx = r.gap>=0 ? mid+dx+6 : mid+8;
+  s+=`<text x="${lx}" y="${y+11}" fill="#F4F6FA" font-size="10.5" font-family="JetBrains Mono">${r.gap>0?'+':''}${r.gap}pt</text>`;
+ });
+ return s+'</svg>';
+}
+function renderDual(){
+ const g = DATA.ga.find(x=>x.id===curGA);
+ const days = DATA.days, W=1160,H=250,P={l:46,r:56,t:18,b:30};
+ const tmap = {}; (g.trend28||[]).forEach(x=>{tmap[x[0]]=x[1]});
+ const t = days.map(d=>tmap[d] ?? null);
+ const maxT=Math.max(...t.filter(v=>v!=null),1);
+ const gaIdx = {}; g.ga_dates.forEach((d,i)=>gaIdx[d]=g.ga_sess[i]);
+ const gv = days.map(d=>gaIdx[d] ?? null), maxG=Math.max(...gv.filter(v=>v!=null),1);
+ const X=i=>P.l+i/(days.length-1)*(W-P.l-P.r);
+ const YT=v=>H-P.b-(v/maxT)*(H-P.t-P.b), YG=v=>H-P.b-(v/maxG)*(H-P.t-P.b);
+ let s=svgOpen(W,H);
+ [0.5,1].forEach(f=>{s+=`<line class="gline" x1="${P.l}" y1="${YT(maxT*f)}" x2="${W-P.r}" y2="${YT(maxT*f)}"/>`});
+ s+=`<text x="${P.l-6}" y="${YT(maxT)+4}" text-anchor="end" fill="#6C9EFF" font-size="9.5" font-family="JetBrains Mono">${maxT}</text>`;
+ s+=`<text x="${W-P.r+6}" y="${YG(maxG)+4}" fill="#98A2B3" font-size="9.5" font-family="JetBrains Mono">${fx(maxG)}</text>`;
+ const gaPts = days.map((d,i)=>gv[i]!=null?`${X(i)},${YG(gv[i])}`:null).filter(Boolean).join(' ');
+ s+=`<polyline points="${gaPts}" fill="none" stroke="#545E70" stroke-width="1.8"/>`;
+ const tPts = days.map((d,i)=>t[i]!=null?`${X(i)},${YT(t[i])}`:null).filter(Boolean).join(' ');
+ s+=`<polyline points="${tPts}" fill="none" stroke="#6C9EFF" stroke-width="2.2"/>`;
+ for(let i=t.length-1;i>=0;i--){ if(t[i]!=null){s+=`<circle cx="${X(i)}" cy="${YT(t[i])}" r="3.5" fill="#6C9EFF"/>`;break}}
+ days.forEach((d,i)=>{ if(i%5===0){s+=`<text x="${X(i)}" y="${H-8}" text-anchor="middle" fill="#545E70" font-size="9" font-family="JetBrains Mono">${d.slice(5)}</text>`}
+  s+=`<rect class="dd" data-i="${i}" x="${X(i)-((W-P.l-P.r)/(days.length-1))/2}" y="${P.t}" width="${(W-P.l-P.r)/(days.length-1)}" height="${H-P.t-P.b}" fill="transparent"/>`});
+ s+='</svg>';
+ $('#dualwrap').innerHTML = s + `<div class="legend"><span><i style="background:#6C9EFF"></i>AI言及ヒット（日次スキャン実測）</span><span><i style="background:#545E70"></i>GA4セッション（右軸）</span><span style="color:var(--fa)">GA未計測日は線を引かない</span></div>`;
+ document.querySelectorAll('#dualwrap .dd').forEach(r=>{
+  const i=+r.dataset.i;
+  bindTT(r,()=>`<b>${days[i]}</b><br>AI言及 <span class="num">${t[i]!=null?t[i]+' ヒット':'—'}</span><br>GA <span class="num">${gv[i]!=null?fx(gv[i])+' sess':'—'}</span>`);
+ });
+}
+
+/* ================= 06 回答リーディング ================= */
+const CARLBL = {raize:'ライズ', roomy:'ルーミー', sienta:'シエンタ', voxy:'ヴォクシー'};
+function renderREAD(){
+ let h = `<div class="sec" style="margin-top:4px"><h2>回答リーディング — 「なぜ選ばれないか」を実物で読む</h2><div class="ln"></div><span class="tag">232万字の在庫から抽出 ／ P0①ドロワーの動作実装</span></div>
+ <p style="font-size:12.5px;color:var(--mu);max-width:780px;margin-bottom:14px">実測セルの<b style="color:var(--tx)">実物の回答</b>をそのまま読む。<mark>対象車=青ハイライト</mark>、競合=白太字、引用は役割バッジ付き。本番では車種オペの全クエリ行に接続する。</p>
+ <div class="grid c2">`;
+ for(const [car,items] of Object.entries(DATA.drawer)){
+  for(const it of items){
+   const tglab = {absent:'全面で不在',behind:'出るが後塵',win:'第一想起を獲得'}[it.tag];
+   const ranks = Object.entries(it.surfaces).map(([s,v])=>{
+    const me = v.order.find(o=>o.id===car);
+    return `${SUR[s]} ${me?me.rank+'位':'—'}`;
+   }).join(' ／ ');
+   h += `<button class="card" style="cursor:pointer;text-align:left" data-car="${car}" data-pid="${it.pid}" onmouseover="this.style.borderColor='var(--ac)'" onmouseout="this.style.borderColor=''">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:9px">${carThumb(car,CARLBL[car],'toyota')}<span class="qc-tag tg-${it.tag}">${tglab} · ${CARLBL[car]}</span></div>
+    <p style="font-size:13px;line-height:1.7">${esc(it.q||it.pid)}</p>
+    <div class="num" style="font-size:10px;color:var(--fa);margin-top:8px">${ranks}</div></button>`;
+  }
+ }
+ h += `</div>`;
+ $('#v-read').innerHTML = h;
+ document.querySelectorAll('#v-read [data-pid]').forEach(b=>b.addEventListener('click',()=>openDrawer(b.dataset.car,b.dataset.pid)));
+}
+let curSur='chatgpt';
+function openDrawer(car,pid){
+ const it = (DATA.drawer[car]||[]).find(x=>x.pid===pid);
+ if(!it) return;
+ curSur = Object.keys(it.surfaces)[0];
+ const d=$('#drawer');
+ d.innerHTML = `<div class="dhead"><button class="dx" id="dx" aria-label="閉じる">✕</button>
+  <div class="q">${esc(it.q||pid)}</div><div class="m">${pid} ／ 対象車: ${CARLBL[car]||car} ／ カテゴリ: ${esc(it.category||'—')}</div>
+  <div class="dtabs" id="dtabs">${Object.keys(it.surfaces).map(s=>`<button class="dtab ${s===curSur?'on':''}" data-s="${s}">${SUR[s]}</button>`).join('')}</div></div>
+  <div class="dbody" id="dbody"></div>`;
+ $('#shade').classList.add('on'); d.classList.add('on');
+ $('#dx').addEventListener('click',closeDrawer);
+ document.querySelectorAll('#dtabs .dtab').forEach(b=>b.addEventListener('click',()=>{curSur=b.dataset.s;document.querySelectorAll('#dtabs .dtab').forEach(x=>x.classList.toggle('on',x===b));drawBody(car,it)}));
+ drawBody(car,it);
+}
+function drawBody(car,it){
+ const v = it.surfaces[curSur];
+ if(!v){$('#dbody').innerHTML='<div class="note">この面の回答なし</div>';return}
+ const own = CARLBL[car];
+ let ans = esc(v.answer||'');
+ ans = ans.replace(/\[([^\]\n]{1,80})\]\((https?:[^)\s]+)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>');
+ const rivNames = v.order.filter(o=>o.id!==car).map(o=>o.name).sort((a,b)=>b.length-a.length);
+ for(const n of rivNames) ans = ans.split(n).join(`⟬R⟭${n}⟬/R⟭`);
+ ans = ans.split(own).join(`⟬O⟭${own}⟬/O⟭`);
+ ans = ans.replace(/⟬R⟭/g,'<b class="riv">').replace(/⟬\/R⟭/g,'</b>').replace(/⟬O⟭/g,'<span class="own">').replace(/⟬\/O⟭/g,'</span>');
+ const orderHtml = v.order.length? v.order.map(o=>`<span class="oc ${o.id===car?'own':''}">${o.rank}位 ${esc(o.name)}</span>`).join('') : '<span class="oc">検出車種なし（対象車も競合も挙がらず）</span>';
+ const cites = (v.cites||[]).map(c=>{
+  const label = c.title || c.host || '';
+  return `<div class="ci"><span class="bk">${esc(c.bucket||'—')}</span><a href="${esc(c.url||'#')}" target="_blank" rel="noopener">${esc(label)}</a></div>`;
+ }).join('') || '<div class="note">引用なし</div>';
+ $('#dbody').innerHTML = `<div style="font-size:10px;color:var(--fa);margin-bottom:6px">AIが挙げた候補の並び順（指名除外後）</div>
+  <div class="order">${orderHtml}</div>
+  <div class="ans">${ans}</div>
+  <div class="cites"><div style="font-size:10px;color:var(--fa);margin:10px 0 4px">この回答の引用（保存済み実データ・先頭6件）</div>${cites}</div>`;
+}
+function closeDrawer(){$('#drawer').classList.remove('on');$('#shade').classList.remove('on')}
+$('#shade').addEventListener('click',closeDrawer);
+addEventListener('keydown',e=>{if(e.key==='Escape')closeDrawer()});
+
+renderHQ(); renderCAR(); renderSEG(); renderCITE(); renderGA();
+</script>
