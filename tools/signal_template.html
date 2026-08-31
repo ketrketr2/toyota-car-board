@@ -519,21 +519,22 @@ function brandDonut(size){
  <text x="${c}" y="${c+size*0.12}" text-anchor="middle" fill="var(--fa)" font-size="${size*0.06}">トヨタ言及シェア</text></svg>`;
 }
 function heroTrendChart(){
- const ty=new Array(31).fill(0), rv=new Array(31).fill(0);
- for(const o of DATA.ovtrend){ o.series.forEach((v,i)=>{ if(o.brand==='toyota') ty[i]+=v; else rv[i]+=v }) }
+ const n=DATA.days.length;
+ const ty=new Array(n).fill(0), rv=new Array(n).fill(0);
+ for(const o of DATA.ovtrend){ o.series.forEach((v,i)=>{ if(i>=n||!Number.isFinite(v)) return; if(o.brand==='toyota') ty[i]+=v; else rv[i]+=v }) }
  const tyM=ma7(ty), rvM=ma7(rv);
  const tt_=trendOfSeries(ty), rt=trendOfSeries(rv);
  const W=640,H=240,P={l:44,r:118,t:16,b:26};
  const mx=Math.max(...tyM,...rvM,1);
- const X=i=>P.l+i/30*(W-P.l-P.r), Y=v=>H-P.b-(v/mx)*(H-P.t-P.b);
+ const X=i=>P.l+i/Math.max(n-1,1)*(W-P.l-P.r), Y=v=>H-P.b-(v/mx)*(H-P.t-P.b);
  let s=svgOpen(W,H);
  [0.5,1].forEach(f=>{s+=`<line class="gline" x1="${P.l}" y1="${Y(mx*f)}" x2="${W-P.r}" y2="${Y(mx*f)}"/><text x="${P.l-5}" y="${Y(mx*f)+3}" text-anchor="end" fill="var(--fa)" font-size="9" font-family="JetBrains Mono">${Math.round(mx*f)}</text>`});
  s+=`<polyline points="${ty.map((v,i)=>X(i)+','+Y(v)).join(' ')}" fill="none" stroke="#6C9EFF" stroke-width="1" opacity=".3"/>`;
  s+=`<polyline points="${rv.map((v,i)=>X(i)+','+Y(v)).join(' ')}" fill="none" stroke="#8A93A6" stroke-width="1" opacity=".25"/>`;
  s+=`<polyline points="${tyM.map((v,i)=>X(i)+','+Y(v)).join(' ')}" fill="none" stroke="#6C9EFF" stroke-width="2.6"/>`;
  s+=`<polyline points="${rvM.map((v,i)=>X(i)+','+Y(v)).join(' ')}" fill="none" stroke="#8A93A6" stroke-width="2"/>`;
- s+=`<text x="${W-P.r+8}" y="${Y(tyM[30])+3}" fill="var(--tx)" font-size="11" font-weight="700">トヨタ計 <tspan fill="${tt_.pct>=0?'#3FD98F':'#FF5C7A'}" font-family="JetBrains Mono">${tt_.pct>0?'+':''}${tt_.pct}%</tspan></text>`;
- s+=`<text x="${W-P.r+8}" y="${Y(rvM[30])+3}" fill="var(--mu)" font-size="11">競合計 <tspan fill="${rt.pct>=0?'#3FD98F':'#FF5C7A'}" font-family="JetBrains Mono">${rt.pct>0?'+':''}${rt.pct}%</tspan></text>`;
+ s+=`<text x="${W-P.r+8}" y="${Y(tyM[n-1])+3}" fill="var(--tx)" font-size="11" font-weight="700">トヨタ計 <tspan fill="${tt_.pct>=0?'#3FD98F':'#FF5C7A'}" font-family="JetBrains Mono">${tt_.pct>0?'+':''}${tt_.pct}%</tspan></text>`;
+ s+=`<text x="${W-P.r+8}" y="${Y(rvM[n-1])+3}" fill="var(--mu)" font-size="11">競合計 <tspan fill="${rt.pct>=0?'#3FD98F':'#FF5C7A'}" font-family="JetBrains Mono">${rt.pct>0?'+':''}${rt.pct}%</tspan></text>`;
  DATA.days.forEach((d,i)=>{if(i%5===0)s+=`<text x="${X(i)}" y="${H-7}" text-anchor="middle" fill="var(--fa)" font-size="9" font-family="JetBrains Mono">${d.slice(5)}</text>`});
  return s+'</svg>';
 }
@@ -553,7 +554,7 @@ function renderHQ(){
   <div class="card hp" data-st="sov" role="button" tabindex="0"><h3>ブランド別シェア（車型横断） ${qm('sov')}</h3>
    ${brandDonut(210)}
    <div class="hpfoot">${DATA.cross.brand_sov.slice(0,3).map(b=>`<span><i class="lg" style="background:${b.brand==='toyota'?'#6C9EFF':'#8A93A6'}"></i>${BN[b.brand]} <b class="num">${b.sov}%</b></span>`).join('')}</div></div>
-  <div class="card hp hpwide" data-st="trend" role="button" tabindex="0"><h3>言及量トレンド — トヨタ計 vs 競合計（31日実測・7日移動平均） ${qm('trend')}</h3>
+  <div class="card hp hpwide" data-st="trend" role="button" tabindex="0"><h3>言及量トレンド — トヨタ計 vs 競合計（${DATA.days.length}日実測・7日移動平均） ${qm('trend')}</h3>
    ${heroTrendChart()}</div>
  </div>
  <div class="statusbar sb-sub" style="margin-top:12px">
@@ -572,7 +573,7 @@ function renderHQ(){
   <span class="evd">${f.ev}</span>
   <span class="arw">›</span></button>`).join('')}
  </div>
- <div class="sec"><h2>トレンド — 上がっている車・下がっている車 ${qm('trend')}</h2><div class="ln"></div><span class="tag">日次スキャン実測 31日 ／ 直近14日 vs 前14日 ／ 行クリックで拡大</span></div>
+ <div class="sec"><h2>トレンド — 上がっている車・下がっている車 ${qm('trend')}</h2><div class="ln"></div><span class="tag">日次スキャン実測 ${DATA.days.length}日 ／ 直近14日 vs 前14日 ／ 行クリックで拡大</span></div>
  <div class="grid c32">
   <div class="card"><h3>全30車種 変化率ランキング（競合含む）</h3><div class="sub">太字=トヨタ。<b>競合の上昇も監視対象</b></div>
    <div class="grid c2" style="gap:4px 22px">${(()=>{
@@ -585,7 +586,7 @@ function renderHQ(){
      <div><div style="font-size:9.5px;color:var(--dn);letter-spacing:.1em;margin-bottom:4px;font-family:var(--mono)">▼ 下降 TOP7</div>${rows.slice(-7).reverse().map(render).join('')}</div>`;
    })()}</div>
    <div class="note">分母が小さい車種（前14日20ヒット未満）は変化率が暴れるため除外。</div></div>
-  <div class="card"><h3>重点8車種 31日推移（7日移動平均）</h3><div class="sub">生データは薄線、太線=移動平均</div>
+  <div class="card"><h3>重点8車種 ${DATA.days.length}日推移（7日移動平均）</h3><div class="sub">生データは薄線、太線=移動平均</div>
    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">${DATA.funnel.map(f=>{
     const o=DATA.ovtrend.find(x=>x.id===f.id); if(!o) return '';
     const tr=trendOfSeries(o.series); const col=tr.pct>=8?'#3FD98F':tr.pct<=-8?'#FF5C7A':'#8A93A6';
@@ -643,7 +644,7 @@ function showOvTrend(id){
  s+=`<polyline points="${m.map((v,i)=>X(i)+','+Y(v)).join(' ')}" fill="none" stroke="${col}" stroke-width="2.4"/>`;
  s+=`<circle cx="${X(o.series.length-1)}" cy="${Y(m[m.length-1])}" r="3.5" fill="${col}"/>`;
  DATA.days.forEach((d,i)=>{if(i%5===0)s+=`<text x="${X(i)}" y="${H-6}" text-anchor="middle" fill="#545E70" font-size="8.5" font-family="JetBrains Mono">${d.slice(5)}</text>`});
- openModal(o.name+' — 言及トレンド 31日（実測）', `<div style="display:flex;gap:18px;align-items:baseline;margin-bottom:8px">
+ openModal(o.name+' — 言及トレンド '+DATA.days.length+'日（実測）', `<div style="display:flex;gap:18px;align-items:baseline;margin-bottom:8px">
   <span class="num" style="font-size:26px;font-weight:800;color:${col}">${tr.pct!=null?(tr.pct>0?'+':'')+tr.pct+'%':'—'}</span>
   <span style="font-size:11px;color:var(--mu)">直近14日 <b class="num">${tr.a}</b>ヒット ／ 前14日 <b class="num">${tr.b}</b>ヒット ／ ${BN[o.brand]}</span></div>
  ${s}</svg><div class="note">日次スキャン（60クエリ）での言及ヒット。細線=日次実測、太線=7日移動平均。</div>`);
@@ -665,7 +666,7 @@ function showStat(kind){
  }
  if(kind==='trend'){
   openModal('言及トレンド — 直近14日 vs 前14日（実測）', `<p>日次スキャン（60クエリ）の言及ヒット合算の変化率。<b>本計測(377クエリ×4面)の時系列は週次cron導入後に追加</b>。</p>
-  <div class="tw"><table class="t"><thead><tr><th>車種</th><th>推移(31日)</th><th>直近14日</th><th>前14日</th><th>変化</th></tr></thead><tbody>
+  <div class="tw"><table class="t"><thead><tr><th>車種</th><th>推移(${DATA.days.length}日)</th><th>直近14日</th><th>前14日</th><th>変化</th></tr></thead><tbody>
   ${DATA.funnel.map(f=>{const t=trendOf(f.id);if(!t)return '';const col=t.pct>=8?'var(--up)':t.pct<=-8?'var(--dn)':'var(--mu)';
    return `<tr><td>${esc(f.name)}</td><td>${sparkSvg(t.series,90,20,col)}</td><td class="num">${t.a}</td><td class="num" style="color:var(--fa)">${t.b}</td><td class="num" style="color:${col};font-weight:700">${t.pct>0?'+':''}${t.pct??'—'}%</td></tr>`}).join('')}
   </tbody></table></div>`);
@@ -967,14 +968,14 @@ function renderSEG(){
    <div class="card" style="margin-top:12px"><h3>出現しやすい車型・しにくい車型 ${qm('density')}</h3><div class="sub">1回答あたり候補数（全車型実測）。低い=ゼロサム</div>${densityChart()}</div>
   </div>
  </div>
- <div class="card" style="margin-top:14px"><h3>${s.label} — 車種別トレンド（31日・7日移動平均） ${qm('trend')}</h3><div class="sub">この車型の中で誰が伸びているか。<b>青=トヨタ／グレー=競合</b>、右端ラベルは直近14日vs前14日</div>
+ <div class="card" style="margin-top:14px"><h3>${s.label} — 車種別トレンド（${DATA.days.length}日・7日移動平均） ${qm('trend')}</h3><div class="sub">この車型の中で誰が伸びているか。<b>青=トヨタ／グレー=競合</b>、右端ラベルは直近14日vs前14日</div>
  ${(()=>{
   const cars=s.rows.map(r=>({...r,o:DATA.ovtrend.find(x=>x.id===r.id)})).filter(r=>r.o);
   if(!cars.length) return '<div class="note">系列なし</div>';
   const W=1120,H=230,P={l:40,r:150,t:14,b:26};
   const mas=cars.map(c=>({...c,m:ma7(c.o.series),tr:trendOfSeries(c.o.series)}));
   const mx=Math.max(...mas.flatMap(c=>c.m),1);
-  const X=i=>P.l+i/30*(W-P.l-P.r), Y=v=>H-P.b-(v/mx)*(H-P.t-P.b);
+  const X=i=>P.l+i/Math.max(DATA.days.length-1,1)*(W-P.l-P.r), Y=v=>H-P.b-(v/mx)*(H-P.t-P.b);
   let out=svgOpen(W,H);
   [0.5,1].forEach(f=>{out+=`<line class="gline" x1="${P.l}" y1="${Y(mx*f)}" x2="${W-P.r}" y2="${Y(mx*f)}"/>`});
   DATA.days.forEach((d,i)=>{if(i%5===0)out+=`<text x="${X(i)}" y="${H-8}" text-anchor="middle" fill="#545E70" font-size="8.5" font-family="JetBrains Mono">${d.slice(5)}</text>`});

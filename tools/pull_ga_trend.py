@@ -73,5 +73,9 @@ for f in files:
         for cid in det:
             cnt[cid] += 1
     trend[d] = {"n": len(cells), "hits": dict(cnt)}
+# 表示窓は直近31日に固定する。スナップショットは毎日増え続けるため、
+# ここでクランプしないとトレンド系列が際限なく伸びて画面側の想定を壊す。
+days = days[-31:]
+trend = {d: trend[d] for d in days}
 json.dump({"days": days, "trend": trend}, open(f'{OUT}/core_trend.json', 'w'), ensure_ascii=False)
 print('core trend days:', len(days), days[0], '..', days[-1])
