@@ -71,11 +71,24 @@ jobs:
           git clone --depth 3 https://github.com/ketrketr2/toyota-geo-board /tmp/gb
           ls /tmp/gb/data/car/snapshots/ | tail -3
 
+      # Gemini/AIによる概要/AIモードの引用はリダイレクタ(vertexaisearch, google.com/goto)で返るため
+      # そのままでは「発信元不明」になる。302を辿って実URLに解決し、結果を永続キャッシュする。
+      # 失敗しても後続は止めない（画面は「不明」のまま出る）。
+      - name: 引用リダイレクタを解決（キャッシュ差分のみ）
+        if: steps.keys.outputs.ok == 'true'
+        continue-on-error: true
+        env:
+          GEO_REPO: /tmp/gb
+          CITE_CACHE: data/cite_resolved.json
+          CITE_BUDGET: "600"
+        run: python3 tools/resolve_cites.py
+
       - name: GA4・トレンド・統合・ビルド・検証
         if: steps.keys.outputs.ok == 'true'
         env:
           WINDSOR_API_KEY: ${{ secrets.WINDSOR_API_KEY }}
           GEO_REPO: /tmp/gb
+          CITE_CACHE: data/cite_resolved.json
           PW_CHROME: ""
         run: |
           set -e
@@ -110,6 +123,7 @@ jobs:
           git config user.name  "car-board-bot"
           git config user.email "actions@users.noreply.github.com"
           git add docs/index.html docs/signal.html
+          git add data/cite_resolved.json 2>/dev/null || true
           git diff --staged --quiet || git commit -m "chore: ボード更新 $(date -u +%Y-%m-%d)"
           git pull --rebase -q || true
           git push
