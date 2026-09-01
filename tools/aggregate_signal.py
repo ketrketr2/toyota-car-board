@@ -199,9 +199,28 @@ OFFICIAL = {"toyota.jp": "toyota", "global.toyota": "toyota", "honda.co.jp": "ho
             "suzuki.co.jp": "suzuki", "daihatsu.co.jp": "daihatsu", "mitsubishi-motors.co.jp": "mitsubishi"}
 REDIR = {"google.com", "vertexaisearch.cloud.google.com"}
 
+# タイアップ候補（＝トヨタが働きかけられる第三者メディア）の判定。
+# 除外するもの: 自社/他社の公式サイト（.com/.jp どちらの綴りでも）、販売店、グループ会社、
+# 官公庁・独立行政法人（国交省・NASVA等。評価機関であって記事の出稿先ではない）。
+_OEM_RE = re.compile(r"(toyota|lexus|daihatsu|honda|nissan|suzuki|mitsubishi-motors|mazda|subaru|netz)\.", re.I)
+
+
+def _tieup_ok(host: str, bucket: str) -> bool:
+    if not host:
+        return False
+    if bucket in ("owned", "competitor", "dealer", "affiliated", "reference"):
+        return False
+    if _OEM_RE.search(host) or OFFICIAL.get(host):
+        return False
+    if host.endswith((".go.jp", ".lg.jp", ".or.jp")):
+        return False
+    return True
+
+
 def cite_pack(cs):
     bucket, host = Counter(), Counter()
     own = comp = deal = total = redir = 0
+    ext = Counter()  # タイアップ候補: メーカー公式でも販売店でもない第三者メディア
     for c in cs:
         for x in (c.get("citations") or []):
             total += 1
@@ -211,6 +230,10 @@ def cite_pack(cs):
                 redir += 1
             else:
                 host[h] += 1
+                # owned(トヨタ公式)・competitor(他社公式)・dealer(販売店)・affiliated(グループ) は
+                # 「タイアップ先」ではないので外す。残るのがメディア/動画/口コミ＝打ち手の相手。
+                if _tieup_ok(h, b):
+                    ext[h] += 1
             if b == "owned" or OFFICIAL.get(h) == "toyota":
                 own += 1
             elif b == "competitor" or OFFICIAL.get(h) in ("honda", "nissan", "suzuki", "daihatsu", "mitsubishi"):
@@ -218,7 +241,8 @@ def cite_pack(cs):
             elif b == "dealer":
                 deal += 1
     return {"total": total, "redir": redir, "bucket": dict(bucket), "own": own, "comp": comp, "dealer": deal,
-            "top_hosts": [[h, n] for h, n in host.most_common(14) if h]}
+            "top_hosts": [[h, n] for h, n in host.most_common(14) if h],
+            "ext_hosts": [[h, n] for h, n in ext.most_common(8) if h]}
 
 cite_all = cite_pack(cells)
 cite_car = {car: cite_pack([c for c in cells if car in c.get("cars", [])]) for car in FOCUS}
@@ -367,11 +391,16 @@ for car in FOCUS:
 # ---------- ファネル ----------
 funnel = []
 for cid, cv in bd["cars"].items():
-    fs = {"F1": cv["f1i"], "F2": cv["f2i"], "F3": cv["f3i"], "F4": cv["f4i"]}
+    # ボトルネックは「トヨタ側が動かせる3段」だけで判定する。
+    # F1(回答生成率×平均引用数)は8車で97.3〜99.5% × 1.52〜1.96本とほぼ差が無く、
+    # その車が何かをした結果ではなく“質問領域の性質”なので、弱点の候補に入れない。
+    fs = {"F2": cv["f2i"], "F3": cv["f3i"], "F4": cv["f4i"]}
     bott = min(fs, key=fs.get)
     funnel.append({"id": cid, "name": cv["name"], "seg": cv["seg"], "f1": cv["f1i"], "f2": cv["f2i"],
                    "f3": cv["f3i"], "f4": cv["f4i"], "expi": cv["expi"], "katarare": cv["katarare"],
                    "mr": cv["mr"], "fr": cv["fr"], "bottleneck": bott, "bv": fs[bott],
+                   # 4段すべて平均以上なら「弱点」と呼ばない（赤リングを付けない）
+                   "weak": fs[bott] < 100,
                    "ai_share": cv["ai_share"], "ga28": cv["ga28"], "sales_m": cv["sales_m"],
                    "sales_share": cv["sales_share"], "answered_rate": cv["answered_rate"],
                    "avg_cites": cv["avg_cites"], "target_cells": cv["target_cells"],

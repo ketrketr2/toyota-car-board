@@ -22,12 +22,16 @@ mark{background:var(--acdim);color:var(--ac2);padding:0 3px;border-radius:3px}
 .top{position:sticky;top:0;z-index:40;background:rgba(6,7,9,.88);backdrop-filter:blur(10px);border-bottom:1px solid var(--hl)}
 .topin{max-width:1280px;margin:0 auto;padding:0 22px;height:62px;display:flex;align-items:center;gap:16px}
 .logo{display:flex;align-items:baseline;gap:9px;white-space:nowrap;cursor:pointer}
+.okpill{border-color:var(--up)!important;color:var(--up)!important}
 .pass{font-size:9px;color:var(--fa);margin-left:4px;white-space:nowrap}
 .realn{display:block;font-family:var(--mono);font-size:9px;color:var(--fa);margin-top:2px;white-space:nowrap;letter-spacing:-.2px}
 .realn b{color:var(--mu);font-weight:700}
 .pbcard{border-color:var(--hl2)}
-.pbrow{display:grid;grid-template-columns:22px 1fr;gap:9px;padding:10px 0;border-top:1px solid var(--hl)}
-.pbrow:first-of-type{border-top:none}
+.pbgrid{display:grid;grid-template-columns:1fr 1fr;gap:0 26px}
+@media(max-width:900px){.pbgrid{grid-template-columns:1fr}}
+.pbrow{display:grid;grid-template-columns:22px 1fr;gap:9px;padding:11px 0;border-top:1px solid var(--hl)}
+.pbgrid .pbrow:nth-child(-n+2){border-top:none}
+@media(max-width:900px){.pbgrid .pbrow:nth-child(2){border-top:1px solid var(--hl)}}
 .pbn{width:20px;height:20px;border-radius:6px;background:var(--acdim);color:var(--ac2);font-family:var(--mono);font-size:10.5px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-top:1px}
 .pbwhat{font-size:12.5px;font-weight:700;color:var(--tx);line-height:1.45}
 .pbwhere{font-size:10.5px;color:var(--mu);margin-top:3px}
@@ -280,9 +284,9 @@ svg text{font-family:var(--body)}
 .note b{color:var(--mu)}
 
 /* car ops */
-.carhead{display:grid;grid-template-columns:290px 1fr;gap:20px;align-items:stretch;margin-bottom:14px}
+.carhead{display:grid;grid-template-columns:270px 1fr;gap:20px;align-items:start;margin-bottom:14px}
 @media(max-width:900px){.carhead{grid-template-columns:1fr}}
-.carimgbig{background:linear-gradient(180deg,#F2F3F5,#E2E5EA);border-radius:13px;border:1px solid var(--hl2);display:flex;align-items:center;justify-content:center;padding:12px;min-height:170px}
+.carimgbig{background:linear-gradient(180deg,#F2F3F5,#E2E5EA);border-radius:13px;border:1px solid var(--hl2);display:flex;align-items:center;justify-content:center;padding:10px;height:150px}
 .carimgbig img{width:96%;height:auto;object-fit:contain;max-height:180px}
 .carsel{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px}
 .segrowx{display:grid;grid-template-columns:repeat(7,1fr);gap:9px;margin-bottom:16px}
@@ -484,11 +488,10 @@ function openModal(title, html){
 function closeModal(){const ms=$('#mshade');if(ms)ms.classList.remove('on')}
 addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
 const HELP = {
- f1:{t:'① 答えの厚み',d:'この車が挙がりうる質問×AI面（＝出番）で、<b>AIがちゃんと答えを返し、根拠(引用)をどれだけ積んだか</b>。回答生成率 × 平均引用数（ノイズドメイン除外）。<b>8車種平均=100の指数</b>。低い＝AIがこの領域の質問に厚く答えられていない＝そもそも土俵が薄い。<b>②との違い</b>：①は「AIがどれだけ語ったか（車名の有無は問わない）」、②は「その中で自車の名前が出たか」。'},
- f2:{t:'② 名前が出た（言及）',d:'出番＝車名を含まない「出現期待クエリ × AI面」のセル。そのうち<b>回答に自車の名前が出た回数</b>。セル内の実数（例 60/180回 33%）が取りこぼしの実態そのもの＝残り120回はAIが答えているのに自車が候補に入っていない。<b>指名クエリは分母から除外</b>（出現が自明でファネルが成立しないため）。指数は8車種平均=100。'},
- f3:{t:'③ 一番手で出た（第一想起）',d:'名前が出た回のうち、<b>全車種中いちばん先に書かれた回数</b>。AIの回答は先頭の車が事実上の「推奨」— <b>名前が出ても2番手では選ばれない</b>。セル内の実数（例 10/60回 17%）で、言及からの取りこぼしが直接読める。指数は8車種平均=100。'},
- f4:{t:'④ サイトに来た（流入）',d:'toyota.jp 該当車種ページのセッション（GA4・直近28日実測）。指数は8車種平均=100。AI上で語られたことが公式サイトへの来訪に変換できているかを見る段。'},
- katarare:{t:'語られ指数',d:'AI言及シェア ÷ 販売台数シェア × 100（どちらも8車種内）。<b>100未満＝売れ行きに比べAIに語られていない</b>。販売台数は自販連・全軽自協の公表実数（月次差し替え）。ランクル250は通称名集計の都合上ランドクルーザー系合算。'},
+ f2:{t:'① 出現率',d:'分母＝車名を含まない「出現期待クエリ × AI面」のセル（＝この車が候補に挙がってしかるべき場面）。そのうち<b>回答に自車の名前が出た回数</b>。セル内の実数（例 60/180回 33%）が取りこぼしの実態そのもの＝残りはAIが答えているのに自車が候補に入っていない。<b>指名クエリは分母から除外</b>（出現が自明でファネルが成立しないため）。指数は8車種平均=100。'},
+ f3:{t:'② 第一出現',d:'出現した回のうち、<b>全車種中いちばん先に書かれた回数（＝第一想起）</b>。AIの回答は先頭の車が事実上の「推奨」— <b>出現しても2番手では選ばれない</b>。セル内の実数（例 10/60回 17%）で、言及からの取りこぼしが直接読める。指数は8車種平均=100。'},
+ f4:{t:'③ JP流入',d:'toyota.jp 該当車種ページのセッション（GA4・直近28日実測）。指数は8車種平均=100。AI上で語られたことが公式サイトへの来訪に変換できているかを見る段。'},
+ katarare:{t:'販売比AI出現指数',d:'AI言及シェア ÷ 販売台数シェア × 100（どちらも8車種内）。<b>100未満＝売れ行きに比べAIに語られていない</b>。販売台数は自販連・全軽自協の公表実数（月次差し替え）。ランクル250は通称名集計の都合上ランドクルーザー系合算。'},
  density:{t:'候補密度',d:'回答が生成されたセルで検出された車種数の平均。<b>高い＝AIがリスト形式で多くの車を挙げる車型</b>（露出機会が多い）／低い＝1〜2台しか挙がらないゼロサム（候補から落ちると完全不在）。'},
  sov:{t:'言及SoV',d:'その車型の非指名セルで検出された全言及のうち、トヨタ車が占める割合。競合を含む同じ土俵での占有率。'},
  fsov:{t:'第一想起SoV',d:'その車型で「回答の最初に書かれた車」のうちトヨタ車が占めた割合。言及SoVとの乖離が大きい車型は「出るのに最初に書かれない」＝語順の問題。'},
@@ -516,7 +519,7 @@ const FINDS = [
  {no:'FINDING 05', ev:'25 vs 56<small>%</small>', h:'AI面ごとに別の戦争をしている', p:'同じライズでもGemini言及56.2%に対しAIモードは25.0%。面ごとに引用も言及も傾向が違い、「どのAI面を攻めるか」を決めずに施策は打てない。', go:'car', gol:'車種オペで面別を見る'},
  {no:'FINDING 06', ev:'-4.4<small>pt</small>', h:'ミニバン2枚看板は露出を流入に変換できていない', p:'ヴォクシー・ノアはAI言及シェアに対しGA流入シェアが4.4pt低い。逆にランクル250は語られていないのに流入している（AI側の伸び代最大）。', go:'ga', gol:'GA×AIで見る'},
 ];
-const BNL = {F1:'答えの厚み',F2:'名前が出た',F3:'一番手で出た',F4:'サイトに来た'};
+const BNL = {F2:'出現率',F3:'第一出現',F4:'JP流入'};
 const FINDS2 = [
  {sev:'高', h:'ルーミー、OEM兄弟のトール（ダイハツ）に劣後', ev:'首位SoV 11%',
   p:'コンパクトトール型の第一想起シェアはトール35.8%・ソリオ31.6%に対しルーミー8.4%。単独露出もトール24セル vs ルーミー9セル。同一車ながらダイハツ名義が回答の主語になっている。', go:'seg', gol:'車型別で見る'},
@@ -631,7 +634,7 @@ function renderHQ(){
   <button class="st" data-st="trend"><span class="ic">›</span><div class="v" style="font-size:16px"><span style="color:var(--up)">▲${ups}</span> <span style="color:var(--dn)">▼${dns}</span></div><div class="l">8車種のトレンド</div></button>
   <button class="st" data-st="bneck"><span class="ic">›</span><div class="v" style="font-size:16px;color:var(--dn)">第一想起×${bn.F3||0}</div><div class="l">最多ボトルネック</div></button>
   <button class="st" data-st="segweak"><span class="ic">›</span><div class="v" style="font-size:16px;color:var(--dn)">${weakSegs.length}<small>/7車型</small></div><div class="l">首位SoV 40%未満</div></button>
-  <button class="st" data-st="kat"><span class="ic">›</span><div class="v" style="font-size:16px;color:var(--dn)">${katLow.length}<small>車種</small></div><div class="l">語られ指数 70未満</div></button>
+  <button class="st" data-st="kat"><span class="ic">›</span><div class="v" style="font-size:16px;color:var(--dn)">${katLow.length}<small>車種</small></div><div class="l">販売比AI出現指数 70未満</div></button>
   <button class="st" data-st="redir"><span class="ic">›</span><div class="v" style="font-size:16px;color:var(--wa)">77<small>%</small></div><div class="l">引用の発信元不明</div></button>
   <button class="st" data-st="round"><span class="ic">›</span><div class="v" style="font-size:16px">${fx(DATA.kpi.cells)}</div><div class="l">計測セル・規律</div></button>
  </div>
@@ -666,18 +669,17 @@ function renderHQ(){
      <svg viewBox="0 0 ${W} ${H}" style="display:block;width:100%;height:auto"><polyline points="${pts(o.series)}" fill="none" stroke="#2A3140" stroke-width="1"/><polyline points="${pts(m)}" fill="none" stroke="${col}" stroke-width="1.8"/></svg></button>`;
    }).join('')}</div></div>
  </div>
- <div class="sec"><h2>ファネル・ボトルネックボード ${qm('rule')}</h2><div class="ln"></div><span class="tag">答えの厚み → 名前が出た → 一番手で出た → サイトに来た ／ セルクリック=内訳 ／ 列見出し=並べ替え</span></div>
+ <div class="sec"><h2>ファネル・ボトルネックボード ${qm('rule')}</h2><div class="ln"></div><span class="tag">出現率 → 第一出現 → JP流入 ／ セルクリック=内訳 ／ 列見出し=並べ替え</span></div>
  <div class="card" style="padding:12px 16px"><div class="tw"><table class="fb" id="fboard"><thead><tr>
   <th data-k="name">車種</th>
-  <th data-k="f1">① 答えの厚み <span class="qmark" role="button" tabindex="0" data-help="f1">?</span></th>
-  <th data-k="f2">② 名前が出た <span class="qmark" role="button" tabindex="0" data-help="f2">?</span></th>
-  <th data-k="f3">③ 一番手で出た <span class="qmark" role="button" tabindex="0" data-help="f3">?</span></th>
-  <th data-k="f4">④ サイトに来た <span class="qmark" role="button" tabindex="0" data-help="f4">?</span></th>
+  <th data-k="f2">① 出現率 <span class="qmark" role="button" tabindex="0" data-help="f2">?</span></th>
+  <th data-k="f3">② 第一出現 <span class="qmark" role="button" tabindex="0" data-help="f3">?</span></th>
+  <th data-k="f4">③ JP流入 <span class="qmark" role="button" tabindex="0" data-help="f4">?</span></th>
   <th data-k="bv" class="on">ボトルネック</th>
   <th>28日トレンド <span class="qmark" role="button" tabindex="0" data-help="trend">?</span></th>
-  <th data-k="katarare">語られ指数 <span class="qmark" role="button" tabindex="0" data-help="katarare">?</span></th>
+  <th data-k="katarare">販売比AI出現指数 <span class="qmark" role="button" tabindex="0" data-help="katarare">?</span></th>
  </tr></thead><tbody></tbody></table></div>
- <div class="note"><b>4段の読み方</b>：①この車が挙がりうる質問×AI面で、AIがどれだけ厚く答えているか → ②その出番のうち何回で名前が出たか → ③名前が出た回のうち何回で一番手だったか → ④公式サイトにどれだけ来たか。<b>大きい数字は8車種平均=100の指数、その下が実数</b>（例「60/180回 33%」＝180回の出番のうち60回で名前が出た）。<b>ボトルネック=4段のうち最も低い段</b>（赤リング）。トレンドは日次スキャン(60クエリ)の言及ヒット実測。</div></div>
+ <div class="note"><b>読み方</b>：①この車が候補に挙がってしかるべき質問×AI面のうち何回で名前が出たか → ②出現した回のうち何回で先頭に書かれたか → ③公式サイトにどれだけ来たか。<b>大きい数字は8車種平均=100の指数、その下が実数</b>（例「60/180回 33%」＝180回の場面のうち60回で出現）。<b>弱点＝3段のうち最も低い段が平均(100)を下回るとき</b>（赤リング）。3段とも平均以上なら「弱点なし」。トレンドは日次スキャン(60クエリ)の言及ヒット実測。</div></div>
  <div class="sec"><h2>重点8車種</h2><div class="ln"></div><span class="tag">クリックで車種別へ</span></div>
  <div class="cargrid">${DATA.funnel.map(f=>{
   const k=f.katarare, kw=Math.min(Math.abs(k-100)/100*50,50);
@@ -686,7 +688,7 @@ function renderHQ(){
    <div class="bd"><div style="display:flex;justify-content:space-between;align-items:baseline"><span class="nm">${esc(f.name)}</span>${trendChip(f.id)}</div><div class="sg">${SEGL[f.seg]||f.seg} ／ 弱点: ${BNL[f.bottleneck]}</div>
    <div class="row"><span>言及率 <b class="num" style="font-size:12px;color:var(--tx)">${f.mr}%</b></span><span>第一想起 <b class="num" style="font-size:12px;color:var(--tx)">${f.fr}%</b></span></div>
    <div class="kb"><em></em><i style="${k>=100?`left:50%;width:${kw}%`:`left:${50-kw}%;width:${kw}%`};background:${k>=100?'var(--up)':'var(--dn)'}"></i></div>
-   <div class="row" style="margin-top:5px"><span>語られ指数</span><span class="num" style="color:${k>=100?'var(--up)':'var(--dn)'};font-weight:700">${k}</span></div>
+   <div class="row" style="margin-top:5px"><span>販売比AI出現指数</span><span class="num" style="color:${k>=100?'var(--up)':'var(--dn)'};font-weight:700">${k}</span></div>
    </div></button>`}).join('')}
  </div>`;
  $('#v-hq').innerHTML = h;
@@ -762,7 +764,7 @@ function showStat(kind){
  if(kind==='redir'){ help('cite') }
  if(kind==='kat'){
   const ks=DATA.funnel.filter(f=>f.katarare<70);
-  openModal('語られ指数 70未満', ks.map(f=>`<div class="def"><span class="dh">${esc(f.name)}</span>語られ指数 <b class="num" style="color:var(--dn)">${f.katarare}</b> ＝ AI言及シェア${f.ai_share}% ÷ 販売シェア${f.sales_share}%。月販<b class="num">${fx(f.sales_m)}</b>台。</div>`).join('')+`<div class="def"><span class="dh">DEFINITION</span>${HELP.katarare.d}</div>`);
+  openModal('販売比AI出現指数 70未満', ks.map(f=>`<div class="def"><span class="dh">${esc(f.name)}</span>販売比AI出現指数 <b class="num" style="color:var(--dn)">${f.katarare}</b> ＝ AI言及シェア${f.ai_share}% ÷ 販売シェア${f.sales_share}%。月販<b class="num">${fx(f.sales_m)}</b>台。</div>`).join('')+`<div class="def"><span class="dh">DEFINITION</span>${HELP.katarare.d}</div>`);
  }
  if(kind==='round'){
   openModal('計測の概要と規律', `<div class="def"><span class="dh">ROUND ${DATA.built}</span>${DATA.kpi.prompts}クエリ × 4AI面 ＝ 1,507セル（車種計測 ${fx(DATA.kpi.cells)}セル）。全回答本文と引用${fx(a.total)}件を保存。1周$38。</div><div class="def"><span class="dh">RULE</span>${HELP.rule.d}</div>`);
@@ -773,7 +775,6 @@ function fcell(f,key,isB){
  const w=Math.min(v,200)/200*100;
  // 指数だけだと「前の段からどれだけ取りこぼしたか」が読めないので、実数と通過率を併記する。
  let real='';
- if(key==='f1') real=`<span class="realn">${f.target_cells}回の出番</span>`;
  if(key==='f2') real=`<span class="realn">${f.mention}/${f.target_cells}回 <b>${f.target_cells>0?Math.round(f.mention/f.target_cells*100):'—'}%</b></span>`;
  if(key==='f3') real=`<span class="realn">${f.first}/${f.mention}回 <b>${f.mention>0?Math.round(f.first/f.mention*100):'—'}%</b></span>`;
  if(key==='f4') real=`<span class="realn">${fx(f.ga28)} sess</span>`;
@@ -782,11 +783,11 @@ function fcell(f,key,isB){
 }
 function fboardRender(key){
  const rows=[...DATA.funnel].sort((a,b)=> key==='name'? a.name.localeCompare(b.name,'ja') : (a[key]??0)-(b[key]??0));
- if(['katarare','mr','f1','f2','f3','f4'].includes(key)) rows.reverse();
+ if(['katarare','mr','f2','f3','f4'].includes(key)) rows.reverse();
  $('#fboard tbody').innerHTML = rows.map(f=>`<tr class="hov" data-car="${f.id}">
   <td><span class="carcell">${carThumb(f.id,f.name,'toyota')}<span><span class="nm">${esc(f.name)}</span><br><span class="sg">${SEGL[f.seg]||''}</span></span></span></td>
-  ${fcell(f,'f1',f.bottleneck==='F1')}${fcell(f,'f2',f.bottleneck==='F2')}${fcell(f,'f3',f.bottleneck==='F3')}${fcell(f,'f4',f.bottleneck==='F4')}
-  <td><span class="bpill">${BNL[f.bottleneck]} = ${f.bv}</span></td>
+  ${fcell(f,'f2',f.weak!==false&&f.bottleneck==='F2')}${fcell(f,'f3',f.weak!==false&&f.bottleneck==='F3')}${fcell(f,'f4',f.weak!==false&&f.bottleneck==='F4')}
+  <td>${f.weak===false?'<span class="bpill okpill">弱点なし</span>':`<span class="bpill">${BNL[f.bottleneck]} = ${f.bv}</span>`}</td>
   <td>${trendChip(f.id)}</td>
   <td class="clicky" data-car="${f.id}" data-fi="katarare"><span class="num" style="color:${f.katarare>=100?'var(--up)':'var(--dn)'};font-weight:700">${f.katarare}</span></td></tr>`).join('');
  document.querySelectorAll('#fboard tbody tr').forEach(tr=>tr.addEventListener('click',()=>{curCar=tr.dataset.car;renderCAR();switchTab('car')}));
@@ -796,12 +797,11 @@ function fboardRender(key){
 function showFunnelDetail(carId,key){
  const f=DATA.funnel.find(x=>x.id===carId), sm=DATA.surfmat[carId], cm=DATA.catmat[carId];
  if(key==='katarare'){
-  openModal(`${f.name} — 語られ指数 ${f.katarare}`, `<div class="def"><span class="dh">実測の分解</span>AI言及シェア <b class="num">${f.ai_share}%</b> ÷ 販売台数シェア <b class="num">${f.sales_share}%</b> × 100 ＝ <b class="num" style="color:${f.katarare>=100?'var(--up)':'var(--dn)'}">${f.katarare}</b><br>月販 <b class="num">${fx(f.sales_m)}</b>台（自販連・全軽自協 実数）</div><div class="def"><span class="dh">DEFINITION</span>${HELP.katarare.d}</div>`);
+  openModal(`${f.name} — 販売比AI出現指数 ${f.katarare}`, `<div class="def"><span class="dh">実測の分解</span>AI言及シェア <b class="num">${f.ai_share}%</b> ÷ 販売台数シェア <b class="num">${f.sales_share}%</b> × 100 ＝ <b class="num" style="color:${f.katarare>=100?'var(--up)':'var(--dn)'}">${f.katarare}</b><br>月販 <b class="num">${fx(f.sales_m)}</b>台（自販連・全軽自協 実数）</div><div class="def"><span class="dh">DEFINITION</span>${HELP.katarare.d}</div>`);
   return;
  }
- const lab={f1:'答えの厚み',f2:'名前が出た（言及）',f3:'一番手で出た（第一想起）',f4:'サイトに来た（流入）'}[key];
+ const lab={f2:'出現率',f3:'第一出現',f4:'JP流入'}[key];
  let detail='';
- if(key==='f1') detail=`<div class="def"><span class="dh">この車の実測</span>回答生成率 <b class="num">${f.answered_rate}%</b> ／ 平均引用数 <b class="num">${f.avg_cites}</b>本/回答 ／ 対象 <b class="num">${f.target_cells}</b>セル</div>`;
  if(key==='f2') detail=`<div class="def"><span class="dh">この車の実測</span>言及 <b class="num">${f.mention}</b> / 分母 <b class="num">${f.target_cells}</b>セル ＝ <b class="num">${f.mr}%</b></div>
   <div class="def"><span class="dh">AI面別の言及率</span>${Object.entries(SUR).map(([s,l])=>`${l} <b class="num" style="color:${(sm[s].mr||0)<30?'var(--dn)':'var(--tx)'}">${sm[s].mr??'—'}%</b>`).join(' ／ ')}</div>
   <div class="def"><span class="dh">カテゴリ別の言及率（穴=赤）</span>${Object.entries(DATA.cat_labels).map(([k,l])=>cm[k]&&cm[k].den?`${l} <b class="num" style="color:${cm[k].mr<30?'var(--dn)':'var(--tx)'}">${cm[k].mr}%</b>`:'').filter(Boolean).join(' ／ ')}</div>`;
@@ -815,10 +815,9 @@ function showFunnelDetail(carId,key){
 /* ================= 02 車種オペレーション ================= */
 let curCar='raize';
 const BOTTLE_TXT = {
- F1:'AIは答えているが、根拠(引用)が薄い。土俵そのものが弱い',
- F2:'AIが答えているのに候補リストに名前が入らない。比較記事・用途別FAQの供給が先',
- F3:'名前は出るのに一番手にならない。「この用途ならこの車」の言い切りが足りない',
- F4:'AIに語られても toyota.jp へ流れていない。受け皿と引用リンクの獲得が先',
+ F2:'AIが答えているのに候補リストに出てこない。比較記事・用途別FAQの供給が先',
+ F3:'出現はするのに第一出現を取れない。「この用途ならこの車」の言い切りが足りない',
+ F4:'AIに出ても toyota.jp へ流れていない。受け皿と引用リンクの獲得が先',
 };
 /* ================= 打ち手ジェネレータ =================
    ボトルネックの段 × 実測で最も弱いカテゴリ × 実際に先を越している競合 から、
@@ -847,19 +846,19 @@ function playbook(f){
   out.push({where:`${page} 配下に新規1ページ`,
    what:pl.what,
    why:`「${DATA.cat_labels[weak[0]]}」の質問で名前が出た率は <b>${weak[1].mr}%</b>（${weak[1].den}回中${weak[1].m??Math.round(weak[1].den*weak[1].mr/100)}回）＝8カテゴリで最も低い。${pl.detail}`,
-   kpi:`このカテゴリの言及率 ${weak[1].mr}% → 次周で改善したか`});
+   kpi:`このカテゴリの出現率 ${weak[1].mr}% → 次周で改善したか`});
  }
  if(f.bottleneck==='F3'&&rival){
   out.push({where:`${page} のトップ（ファーストビュー）と比較ページ`,
    what:`「${esc(f.name)}を選ぶべき人」を先頭1文で言い切る`,
-   why:`名前は出るのに一番手は <b>${f.first}/${f.mention}回（${f.mention>0?Math.round(f.first/f.mention*100):0}%）</b>。この車型でAIが先に挙げるのは <b>${esc(rival[0])}</b>（${rival[1]}回）。AIは結論が先に書かれた文を引用して先頭に置く傾向がある`,
-   kpi:`一番手率 ${f.mention>0?Math.round(f.first/f.mention*100):0}% の改善`});
+   why:`出現はするのに第一出現は <b>${f.first}/${f.mention}回（${f.mention>0?Math.round(f.first/f.mention*100):0}%）</b>。この車型でAIが先に挙げるのは <b>${esc(rival[0])}</b>（${rival[1]}回）。AIは結論が先に書かれた文を引用して先頭に置く傾向がある`,
+   kpi:`第一出現率 ${f.mention>0?Math.round(f.first/f.mention*100):0}% の改善`});
  }
  if(f.bottleneck==='F2'||(weak2&&weak2[1].mr<40)){
   out.push({where:`toyota.jp の車種横断ページ（用途・条件から選ぶ導線）`,
    what:`用途×条件のランディング（例「3列シート×5人家族×予算◯万」）`,
-   why:`AIが答えているのに候補に入らない出番が <b>${f.target_cells-f.mention}回</b>ある。指名されない質問は「用途と条件」で聞かれるため、車種名ではなく条件で引ける面を作る`,
-   kpi:`名前が出た率 ${f.target_cells>0?Math.round(f.mention/f.target_cells*100):0}% の改善`});
+   why:`AIが答えているのに候補に入らない場面が <b>${f.target_cells-f.mention}回</b>ある。指名されない質問は「用途と条件」で聞かれるため、車種名ではなく条件で引ける面を作る`,
+   kpi:`出現率 ${f.target_cells>0?Math.round(f.mention/f.target_cells*100):0}% の改善`});
  }
  if(f.bottleneck==='F1'){
   out.push({where:`${page} の主要ページ全体`,
@@ -870,14 +869,22 @@ function playbook(f){
  if(f.bottleneck==='F4'||(f.ai_share&&DATA.ga.find(g=>g.id===f.id)&&DATA.ga.find(g=>g.id===f.id).ga_share<f.ai_share)){
   out.push({where:`${page}（AIの回答から直接来る想定の入口）`,
    what:`回答の要約に載る短いリード文＋短縮しないURL構造`,
-   why:`AI上の言及シェア <b>${f.ai_share}%</b> に対して公式サイトのシェアは <b>${(DATA.ga.find(g=>g.id===f.id)||{}).ga_share??'—'}%</b>。語られてはいるが公式に戻せていない`,
+   why:`AI上の出現シェア <b>${f.ai_share}%</b> に対して公式サイトのシェアは <b>${(DATA.ga.find(g=>g.id===f.id)||{}).ga_share??'—'}%</b>。語られてはいるが公式に戻せていない`,
    kpi:`GAシェアと言及シェアの差`});
  }
- if(weakSurf&&weakSurf[1].mr!=null&&weakSurf[1].mr<25){
-  out.push({where:`外部（${SUR[weakSurf[0]]}が根拠にしているメディア）`,
-   what:`比較記事・ランキング記事への情報提供（一次データの提供）`,
-   why:`<b>${SUR[weakSurf[0]]}</b>での言及率が <b>${weakSurf[1].mr}%</b> と4面で最も低い。この面はメディア記事を根拠にする比率が高く、公式ページだけでは動かない`,
-   kpi:`${SUR[weakSurf[0]]}の言及率 ${weakSurf[1].mr}%`});
+ // 公式サイト外（タイアップ）の打ち手は必ず1本入れる。
+ // Google系3面の引用元を復元した結果、根拠の主役は中古車流通メディアとYouTubeで、
+ // toyota.jp だけをいくら整えても動かない領域があるため。
+ // メーカー公式・販売店を除いた第三者メディアだけをタイアップ候補にする（集計側で分類済み）
+ const ext=(ci.ext_hosts||[]).slice(0,3);
+ const extName={'youtube.com':'YouTube（動画）','nextage.jp':'ネクステージ','221616.com':'グーバイク/カーセンサー系','carsensor.net':'カーセンサー','goo-net.com':'グーネット','carview.yahoo.co.jp':'carview!','autoc-one.jp':'オートックワン','kurumaerabi.com':'車選びドットコム','bestcarweb.jp':'ベストカーWeb','kakaku.com':'価格.com'};
+ if(ext.length){
+  const label=ext.map(h=>`${extName[h[0]]||h[0]}(${h[1]}件)`).join('・');
+  const surfNote=weakSurf&&weakSurf[1].mr!=null?`とくに<b>${SUR[weakSurf[0]]}</b>は出現率 <b>${weakSurf[1].mr}%</b> と4面で最も低く、この面は公式ページだけでは動かない。`:'';
+  out.push({where:`外部メディア（タイアップ／情報提供）：${label}`,
+   what:`AIが実際に根拠にしているメディアとのタイアップ記事・動画`,
+   why:`この車の質問でAIが引いた外部ドメインの実測上位。${surfNote}中古車流通メディアと動画がAIの「教科書」になっているため、<b>公式ページの改修と並行して、この3媒体に一次データ（実燃費・積載寸法・維持費）を提供したタイアップ</b>を打つのが最短。記事側にトヨタ提供の数値表が入ると、そのままAIの引用単位になる`,
+   kpi:`このドメインからの引用件数（現在 ${ext.reduce((a,b)=>a+b[1],0)}件）と、そこ経由の出現率`});
  }
  return out.slice(0,4);
 }
@@ -893,27 +900,29 @@ function renderCAR(){
   <div class="carimgbig">${carThumb(curCar,f.name,'toyota',true)}</div>
   <div><div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap"><span style="font-size:23px;font-weight:700">${esc(f.name)}</span><span class="chip">${SEGL[f.seg]}</span><span class="bpill">弱点: ${BNL[f.bottleneck]}（指数${f.bv}）</span><span style="margin-left:auto">${trendChip(curCar)}</span></div>
   <div class="statchips">
-   <div class="sc"><div class="v num">${f.mr}<small>%</small></div><div class="l">言及率（${rank}/8位）</div></div>
-   <div class="sc"><div class="v num">${f.fr}<small>%</small></div><div class="l">第一想起率（${frank}/8位）</div></div>
-   <div class="sc"><div class="v num" style="color:${f.pos_rate>=25?'var(--up)':'var(--tx)'}">${f.pos_rate??'—'}<small>%</small></div><div class="l">好意的言及率 <span class="qmark" role="button" tabindex="0" data-help="pos">?</span></div></div>
-   <div class="sc"><div class="v num" style="color:${f.katarare>=100?'var(--up)':'var(--dn)'}">${f.katarare}</div><div class="l">語られ指数</div></div>
+   <div class="sc"><div class="v num">${f.mr}<small>%</small></div><div class="l">出現率（${rank}/8位）</div></div>
+   <div class="sc"><div class="v num">${f.fr}<small>%</small></div><div class="l">第一出現率（${frank}/8位）</div></div>
+   <div class="sc"><div class="v num" style="color:${f.pos_rate>=25?'var(--up)':'var(--tx)'}">${f.pos_rate??'—'}<small>%</small></div><div class="l">好意的出現率 <span class="qmark" role="button" tabindex="0" data-help="pos">?</span></div></div>
+   <div class="sc"><div class="v num" style="color:${f.katarare>=100?'var(--up)':'var(--dn)'}">${f.katarare}</div><div class="l">販売比AI出現指数</div></div>
    <div class="sc"><div class="v num" style="color:${conv>=100?'var(--up)':'var(--dn)'}">${conv??'—'}</div><div class="l">AI→流入変換 <span class="qmark" role="button" tabindex="0" data-help="conv">?</span></div></div>
    <div class="sc"><div class="v num">${fx(f.ga28)}</div><div class="l">GA4 28日 sess</div></div>
   </div>
-  <div class="insight warnb" style="margin-top:10px"><span class="h">BOTTLENECK</span><b>${BNL[f.bottleneck]}（指数${f.bv}）が最深。</b>${BOTTLE_TXT[f.bottleneck]}</div>
-  <div class="card pbcard" style="margin-top:10px"><h3>打ち手 — どこに何を置くか</h3><div class="sub">この車の実測から出した具体案。数字はすべて画面上の実測値が根拠</div>
+  ${f.weak===false?`<div class="insight" style="margin-top:10px"><span class="h">STATUS</span><b>3段とも8車種平均以上。</b>明確な弱点は無い。最も低いのは${BNL[f.bottleneck]}（指数${f.bv}）だが平均超のため、現状維持＋監視でよい。</div>`:`<div class="insight warnb" style="margin-top:10px"><span class="h">BOTTLENECK</span><b>${BNL[f.bottleneck]}（指数${f.bv}）が最深。</b>${BOTTLE_TXT[f.bottleneck]}</div>`}
+  </div>
+ </div>
+ <div class="card pbcard"><h3>打ち手 — どこに何を置くか</h3><div class="sub">この車の実測から出した具体案。数字はすべて画面上の実測値が根拠。公式サイト内の施策と、AIが実際に引いている外部メディアへの施策を併記</div>
+  <div class="pbgrid">
    ${playbook(f).map((a,i)=>`<div class="pbrow"><span class="pbn">${i+1}</span><div>
     <div class="pbwhat">${a.what}</div>
     <div class="pbwhere">置き場所：<b>${esc(a.where)}</b></div>
     <div class="pbwhy">${a.why}</div>
-    <div class="pbkpi">確認する指標：${a.kpi}</div></div></div>`).join('')||'<div class="note">この車は4段とも平均以上。現状維持で監視。</div>'}
-  </div>
+    <div class="pbkpi">確認する指標：${a.kpi}</div></div></div>`).join('')||'<div class="note">この車は3段とも平均以上。現状維持で監視。</div>'}
   </div>
  </div>
  <div class="grid c2">
   <div class="card"><h3>ファネル — どこで落ちているか ${qm('rule')}</h3><div class="sub">8車種平均=100の指数。<b>行クリックで内訳</b></div>
-   ${['f1','f2','f3','f4'].map((k,i)=>{
-    const v=f[k], lab=['① 答えの厚み','② 名前が出た','③ 一番手で出た','④ サイトに来た'][i], isB=f.bottleneck==='F'+(i+1);
+   ${['f2','f3','f4'].map((k,i)=>{
+    const v=f[k], lab=['① 出現率','② 第一出現','③ JP流入'][i], isB=(f.weak!==false)&&f.bottleneck==='F'+(i+2);
     const w=Math.min(v,200)/200*100;
     return `<div class="clicky" data-fk="${k}" style="display:grid;grid-template-columns:110px 1fr 44px;gap:10px;align-items:center;margin:9px 0">
      <span style="font-size:11px;color:${isB?'var(--dn)':'var(--mu)'};text-align:right;font-weight:${isB?700:400}">${lab}</span>
@@ -921,7 +930,7 @@ function renderCAR(){
       <i style="position:absolute;left:0;top:0;bottom:0;width:${w}%;border-radius:5px;background:${v>=100?'var(--up)':'var(--dn)'};opacity:.8"></i>
       <i style="position:absolute;left:50%;top:-3px;bottom:-3px;width:1px;background:var(--hl2)"></i></div>
      <span class="num" style="font-weight:700;color:${v>=100?'var(--up)':'var(--dn)'}">${v}</span></div>`}).join('')}
-   <div class="note">①答えの厚み=回答生成率×引用数（AIがどれだけ厚く答えたか）／②名前が出た=出番のうち車名が登場した割合（${f.mention}/${f.target_cells}回）／③一番手で出た=言及のうち先頭に書かれた割合（${f.first}/${f.mention}回）／④サイトに来た=GA4実測</div>
+   <div class="note">①出現率=${f.mention}/${f.target_cells}回（分母＝出現期待クエリ×AI4面・指名除外）／②第一出現=${f.first}/${f.mention}回／③JP流入=GA4実測 ${fx(f.ga28)}sess</div>
    <div class="card" style="margin-top:12px;padding:12px 14px"><h3 style="margin-bottom:2px">得意・不得意レーダー — ${esc(f.name)} vs ${esc((DATA.segs.find(s=>s.seg===f.seg).rows.find(r=>r.id===DATA.rival_of[curCar])||{}).name||'競合')} ${qm('radar')}</h3>
    <div class="sub">カテゴリ別。<span id="rmode-l"></span>切替 →
     <button class="dtab on" id="rm-mr" style="padding:2px 10px;font-size:9.5px">言及率</button>
@@ -1258,7 +1267,7 @@ function renderGA(){
  renderDual();
  document.querySelectorAll('#v-ga .gp').forEach(p=>{
   const g = DATA.ga[+p.dataset.i];
-  bindTT(p,()=>`<b>${esc(g.name)}</b><br>AI言及シェア <span class="num">${g.ai_share}%</span> ／ GAシェア <span class="num">${g.ga_share}%</span><br>GA 28日 <span class="num">${fx(g.ga28)}</span> sess ／ 語られ指数 <span class="num">${g.katarare}</span>`);
+  bindTT(p,()=>`<b>${esc(g.name)}</b><br>AI言及シェア <span class="num">${g.ai_share}%</span> ／ GAシェア <span class="num">${g.ga_share}%</span><br>GA 28日 <span class="num">${fx(g.ga28)}</span> sess ／ 販売比AI出現指数 <span class="num">${g.katarare}</span>`);
  });
 }
 function gaScatter(){
