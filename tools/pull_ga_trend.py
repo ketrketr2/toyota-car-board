@@ -15,8 +15,10 @@ GEO = os.environ.get('GEO_REPO', '/tmp/gb')
 OUT = os.environ.get('WORK_DIR', 'work')
 os.makedirs(OUT, exist_ok=True)
 
+# lc250 は "/landcruiser" の前方一致。250/300/70/プラドのページをまとめて拾う
+# （言及側をランクル統合したので、GA も同じ粒度に揃える）。
 SLUG = {"roomy": "/roomy/", "sienta": "/sienta/", "alphard": "/alphard/", "voxy": "/voxy/",
-        "noah": "/noah/", "aqua": "/aqua/", "raize": "/raize/", "lc250": "/landcruiser250/"}
+        "noah": "/noah/", "aqua": "/aqua/", "raize": "/raize/", "lc250": "/landcruiser"}
 
 def q(fields, dfrom, dto, flt=None, extra=None):
     p = {'api_key': KEY, 'select_accounts': ACC, '_renderer': 'json',

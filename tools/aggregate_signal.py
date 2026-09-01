@@ -10,7 +10,7 @@
 
 規律: 推定値・デモ値を作らない。指名クエリ（named_cars）は当該車の分母・分子から除外。
 """
-import glob, json, os, re
+import glob, json, os, re, sys
 from collections import Counter, defaultdict
 
 GEO = os.environ.get("GEO_REPO", "/tmp/gb")
@@ -20,6 +20,42 @@ OUT = os.environ.get("SIGNAL_DATA", "signal_data.json")
 bd = json.load(open(BD_PATH, encoding="utf-8"))
 snap_path = sorted(glob.glob(os.path.join(GEO, "data", "car", "snapshots", "*.json")))[-1]
 snap = json.load(open(snap_path, encoding="utf-8"))
+
+# 計測時のカタログではなく“現行の”カタログで引き直す（誤検出修正・ブランド統合を遡及適用）
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from redetect import redetect  # noqa: E402
+_n, _stat = redetect(snap["cells"], GEO)
+print(f"再検出(signal): {_stat['cells_changed']}セル更新 (+{_stat['detections_added']} / -{_stat['detections_removed']})")
+
+# リダイレクタ（Gemini/AIによる概要/AIモードの引用）を解決済みキャッシュで実URLに差し替える。
+# ここで直しておくと、不明率・引用元カタログ・ホスト別集計がすべて実態に変わる。
+_cite_cache_path = os.environ.get("CITE_CACHE", "data/cite_resolved.json")
+try:
+    _cmap = json.load(open(_cite_cache_path, encoding="utf-8")).get("resolved", {})
+except Exception:
+    _cmap = {}
+if _cmap:
+    sys.path.insert(0, os.path.join(GEO, "src"))
+    try:
+        from analyze import classify_url  # noqa: E402
+    except Exception:
+        classify_url = None
+    _swapped = 0
+    for _c in snap["cells"]:
+        for _x in (_c.get("citations") or []):
+            _real = _cmap.get(_x.get("url") or "")
+            if not _real:
+                continue
+            _x["url"] = _real
+            if classify_url:
+                _cl = classify_url(_real)
+                _x["host"], _x["bucket"] = _cl["host"], _cl["bucket"]
+                _x["platform"] = _cl.get("platform")
+            _swapped += 1
+    print(f"引用リダイレクタ解決: {_swapped}件を実URLに差し替え（キャッシュ {len(_cmap)}件）")
+else:
+    print("引用リダイレクタ解決: キャッシュなし（Google系3面は「不明」のまま）")
+
 cells = [c for c in snap["cells"] if c.get("tier") == "car"]
 
 NAME = {o["id"]: o["name"] for o in bd["overview"]}
@@ -34,7 +70,8 @@ SEGCARS = {
     "minivan_l": ["alphard", "vellfire", "elgrand"],
     "compact_hb": ["aqua", "yaris", "fit", "note"],
     "suv_compact": ["raize", "yariscross", "rocky", "crossbee", "wrv"],
-    "suv_off": ["lc250", "lc300", "lc70", "prado", "rav4", "jimny_sierra", "xtrail", "outlander"],
+    # lc300/lc70/prado は lc250（ランドクルーザー）に統合済み
+    "suv_off": ["lc250", "rav4", "jimny_sierra", "xtrail", "outlander"],
 }
 SEGLABEL = {"compact_tall": "コンパクトトール", "minivan_s": "スモールミニバン", "minivan_m": "ミドルミニバン",
             "minivan_l": "ラージミニバン", "compact_hb": "コンパクト", "suv_compact": "コンパクトSUV",
@@ -191,7 +228,26 @@ for c in cells:
     for p in (c.get("cited_car_pages") or []):
         u = p if isinstance(p, str) else p.get("url", "")
         pagec[u] += 1; pageq[u].add(c["prompt_id"])
-cited_pages = [[u, n, len(pageq[u])] for u, n in pagec.most_common(12)]
+# cited_car_pages は車種ID（"sienta"）で保存されている。画面でリンクにするため
+# cars.yaml の slug から toyota.jp の実URLに直す（ID のままだと href="sienta" の壊れたリンクになる）。
+import yaml as _yaml  # noqa: E402
+_cars_cfg = _yaml.safe_load(open(os.path.join(GEO, "config", "cars.yaml"), encoding="utf-8"))
+_SLUG = {c["id"]: c.get("slug") for c in _cars_cfg["focus"]}
+_URL = {c["id"]: c.get("url") for c in _cars_cfg["focus"]}
+_CARNAME = {c["id"]: c["name"] for c in _cars_cfg["focus"]}
+
+
+def _page_url(key):
+    if str(key).startswith("http"):
+        return key
+    if _URL.get(key):
+        return _URL[key]
+    slug = _SLUG.get(key)
+    return f"https://toyota.jp{slug}/" if slug else None
+
+
+cited_pages = [[_page_url(u), _CARNAME.get(u, u), n, len(pageq[u])]
+               for u, n in pagec.most_common(12)]
 
 def classify(h):
     if not h or h in REDIR: return "unknown"
@@ -319,7 +375,10 @@ for cid, cv in bd["cars"].items():
                    "ai_share": cv["ai_share"], "ga28": cv["ga28"], "sales_m": cv["sales_m"],
                    "sales_share": cv["sales_share"], "answered_rate": cv["answered_rate"],
                    "avg_cites": cv["avg_cites"], "target_cells": cv["target_cells"],
-                   "mention": cv["mention"], "first": cv["first"], "pos_rate": posrate[cid]})
+                   "mention": cv["mention"], "first": cv["first"], "pos_rate": posrate[cid],
+                   # 打ち手の生成に使う: 先を越している競合と、公式ページの置き場所
+                   "win": cv.get("win") or [], "slug": _SLUG.get(cid) or ("/" + cid),
+                   "url": _page_url(cid)})
 
 # ---------- 全クエリ4面詳細 ----------
 qtext = {}

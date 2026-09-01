@@ -23,6 +23,18 @@ mark{background:var(--acdim);color:var(--ac2);padding:0 3px;border-radius:3px}
 .topin{max-width:1280px;margin:0 auto;padding:0 22px;height:62px;display:flex;align-items:center;gap:16px}
 .logo{display:flex;align-items:baseline;gap:9px;white-space:nowrap;cursor:pointer}
 .pass{font-size:9px;color:var(--fa);margin-left:4px;white-space:nowrap}
+.realn{display:block;font-family:var(--mono);font-size:9px;color:var(--fa);margin-top:2px;white-space:nowrap;letter-spacing:-.2px}
+.realn b{color:var(--mu);font-weight:700}
+.pbcard{border-color:var(--hl2)}
+.pbrow{display:grid;grid-template-columns:22px 1fr;gap:9px;padding:10px 0;border-top:1px solid var(--hl)}
+.pbrow:first-of-type{border-top:none}
+.pbn{width:20px;height:20px;border-radius:6px;background:var(--acdim);color:var(--ac2);font-family:var(--mono);font-size:10.5px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-top:1px}
+.pbwhat{font-size:12.5px;font-weight:700;color:var(--tx);line-height:1.45}
+.pbwhere{font-size:10.5px;color:var(--mu);margin-top:3px}
+.pbwhere b{font-family:var(--mono);font-size:10px;color:var(--ac2)}
+.pbwhy{font-size:11px;color:var(--mu);line-height:1.6;margin-top:4px}
+.pbwhy b{color:var(--tx)}
+.pbkpi{font-size:10px;color:var(--fa);margin-top:4px;font-family:var(--mono)}
 .logo .dot{width:8px;height:8px;border-radius:50%;background:var(--ac);box-shadow:0 0 10px var(--ac);display:inline-block;animation:pulse 2.6s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.45}}
 .logo b{font-size:14.5px;letter-spacing:.05em}
@@ -52,8 +64,9 @@ mark{background:var(--acdim);color:var(--ac2);padding:0 3px;border-radius:3px}
 
 .card{background:var(--sf);border:1px solid var(--hl);border-radius:13px;padding:18px 20px;transition:border-color .18s}
 .card:hover{border-color:var(--hl2)}
-.card h3{font-size:12px;color:var(--mu);font-weight:700;letter-spacing:.08em;margin-bottom:3px}
-.card .sub{font-size:11px;color:var(--fa);margin-bottom:12px;line-height:1.6}
+.card h3{font-size:13.5px;color:var(--tx);font-weight:700;letter-spacing:.01em;line-height:1.45;margin-bottom:5px;position:relative;padding-left:11px}
+.card h3::before{content:"";position:absolute;left:0;top:.22em;height:1.05em;width:3px;border-radius:2px;background:var(--ac);opacity:.8}
+.card .sub{font-size:10.5px;color:var(--fa);margin-bottom:12px;line-height:1.65;padding-left:11px}
 .sec{margin:28px 0 12px;display:flex;align-items:baseline;gap:12px}
 .sec h2{font-size:15px;letter-spacing:.04em}
 .sec .ln{flex:1;height:1px;background:var(--hl)}
@@ -380,9 +393,65 @@ function switchTab(v){
  document.querySelectorAll('#tabs .tab').forEach(x=>x.classList.toggle('on',x.dataset.v===v));
  document.querySelectorAll('.view').forEach(x=>x.classList.remove('on'));
  $('#v-'+v).classList.add('on'); window.scrollTo({top:0});
+ if(v==='hq') animateHQ();
+}
+
+/* ---------- 概況の主要3指標を「開いた瞬間に立ち上がる」見せ方にする ----------
+   総合スコア＝ゲージが伸びながら数字がカウントアップ、ブランドシェア＝円弧が順に描かれる、
+   言及量トレンド＝線が左から引かれる。動きは1回だけ（タブを戻すたびに動くと煩い）。
+   OSで「視差効果を減らす」を選んでいる人には動かさない。 */
+let __hqAnimated=false;
+function animateHQ(){
+ if(__hqAnimated) return; __hqAnimated=true;
+ const root=document.getElementById('v-hq'); if(!root) return;
+ let reduce=false; try{reduce=matchMedia('(prefers-reduced-motion: reduce)').matches}catch(e){}
+ if(reduce) return;
+ // 1) ドーナツ/ゲージの円弧を0から伸ばす
+ root.querySelectorAll('.heroP svg circle[stroke-dasharray]').forEach((c,i)=>{
+  const da=c.getAttribute('stroke-dasharray'); if(!da) return;
+  const rest=da.split(/\s+/)[1]||'';
+  c.style.strokeDasharray='0 '+rest;
+  requestAnimationFrame(()=>{
+   c.style.transition='stroke-dasharray .95s cubic-bezier(.22,.75,.24,1) '+(120+i*110)+'ms';
+   c.style.strokeDasharray=da;
+  });
+ });
+ // 2) 折れ線は左から引く
+ root.querySelectorAll('.heroP svg polyline').forEach((pl,i)=>{
+  let L=0; try{L=pl.getTotalLength()}catch(e){}
+  if(!L) return;
+  pl.style.strokeDasharray=L; pl.style.strokeDashoffset=L;
+  requestAnimationFrame(()=>{
+   pl.style.transition='stroke-dashoffset 1.15s cubic-bezier(.3,.8,.3,1) '+(180+i*70)+'ms';
+   pl.style.strokeDashoffset=0;
+  });
+ });
+ // 3) 数字はカウントアップ（小数第1位まで対応）
+ root.querySelectorAll('[data-cnt]').forEach((el,i)=>{
+  const to=parseFloat(el.getAttribute('data-cnt')); if(isNaN(to)) return;
+  const dec=(el.getAttribute('data-dec')|0), suf=el.getAttribute('data-suf')||'';
+  const t0=performance.now()+100+i*60, dur=850;
+  const step=now=>{
+   const p=Math.min(Math.max((now-t0)/dur,0),1);
+   const e=1-Math.pow(1-p,3);
+   el.textContent=(to*e).toFixed(dec)+suf;
+   if(p<1) requestAnimationFrame(step);
+  };
+  el.textContent=(0).toFixed(dec)+suf;
+  requestAnimationFrame(step);
+ });
+ // 4) カード自体もわずかに立ち上げる
+ root.querySelectorAll('.heroP .hp').forEach((c,i)=>{
+  c.style.opacity=0; c.style.transform='translateY(10px)';
+  requestAnimationFrame(()=>{
+   c.style.transition='opacity .5s ease '+(i*90)+'ms, transform .5s cubic-bezier(.2,.8,.3,1) '+(i*90)+'ms';
+   c.style.opacity=1; c.style.transform='none';
+  });
+ });
 }
 document.querySelectorAll('#tabs .tab').forEach(b=>b.addEventListener('click',()=>switchTab(b.dataset.v)));
 $('#meta').innerHTML = `データ更新 <b>${DATA.built} 07:35 JST</b> ／ ${fx(DATA.kpi.cells)}セル`;
+requestAnimationFrame(()=>{try{animateHQ()}catch(e){}});
 $('#btn-print').addEventListener('click',()=>window.print());
 $('#btn-theme').addEventListener('click',()=>{document.body.classList.toggle('light');try{localStorage.setItem('sr-theme',document.body.classList.contains('light')?'light':'dark')}catch(e){}});
 try{if(localStorage.getItem('sr-theme')==='light')document.body.classList.add('light')}catch(e){}
@@ -415,10 +484,10 @@ function openModal(title, html){
 function closeModal(){const ms=$('#mshade');if(ms)ms.classList.remove('on')}
 addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
 const HELP = {
- f1:{t:'F1 露出機会',d:'AIが回答を生成した率 × 平均引用数（ノイズドメイン除外）。<b>8車種平均=100の指数</b>。低い＝そもそもAIがこの車の質問で回答・根拠を組み立てにくい。'},
- f2:{t:'F2 車種言及',d:'出現すべき質問群（車名を含まない出現期待クエリ）で、回答に車名が登場した率。<b>指名クエリは分母から除外</b>（出現が自明でファネルが成立しなくなるため）。指数は8車種平均=100。セル内の<b>「通過％」は露出機会のうち実際に言及された割合の実測</b>で、露出機会と言及の差分（どれだけ取りこぼしているか）を直接示す。'},
- f3:{t:'F3 第一想起',d:'言及された回答のうち、全車種中いちばん先に書かれた率。AIの回答は先頭の車が事実上の「推奨」— <b>言及されても2番手では選ばれない</b>。指数は8車種平均=100。セル内の<b>「通過％」は言及のうち首位を取れた割合の実測</b>。'},
- f4:{t:'F4 流入',d:'toyota.jp該当車種ページのセッション（GA4・直近28日実測）。指数は8車種平均=100。AI上の露出が公式サイトへの来訪に変換できているかを見る。'},
+ f1:{t:'① 答えの厚み',d:'この車が挙がりうる質問×AI面（＝出番）で、<b>AIがちゃんと答えを返し、根拠(引用)をどれだけ積んだか</b>。回答生成率 × 平均引用数（ノイズドメイン除外）。<b>8車種平均=100の指数</b>。低い＝AIがこの領域の質問に厚く答えられていない＝そもそも土俵が薄い。<b>②との違い</b>：①は「AIがどれだけ語ったか（車名の有無は問わない）」、②は「その中で自車の名前が出たか」。'},
+ f2:{t:'② 名前が出た（言及）',d:'出番＝車名を含まない「出現期待クエリ × AI面」のセル。そのうち<b>回答に自車の名前が出た回数</b>。セル内の実数（例 60/180回 33%）が取りこぼしの実態そのもの＝残り120回はAIが答えているのに自車が候補に入っていない。<b>指名クエリは分母から除外</b>（出現が自明でファネルが成立しないため）。指数は8車種平均=100。'},
+ f3:{t:'③ 一番手で出た（第一想起）',d:'名前が出た回のうち、<b>全車種中いちばん先に書かれた回数</b>。AIの回答は先頭の車が事実上の「推奨」— <b>名前が出ても2番手では選ばれない</b>。セル内の実数（例 10/60回 17%）で、言及からの取りこぼしが直接読める。指数は8車種平均=100。'},
+ f4:{t:'④ サイトに来た（流入）',d:'toyota.jp 該当車種ページのセッション（GA4・直近28日実測）。指数は8車種平均=100。AI上で語られたことが公式サイトへの来訪に変換できているかを見る段。'},
  katarare:{t:'語られ指数',d:'AI言及シェア ÷ 販売台数シェア × 100（どちらも8車種内）。<b>100未満＝売れ行きに比べAIに語られていない</b>。販売台数は自販連・全軽自協の公表実数（月次差し替え）。ランクル250は通称名集計の都合上ランドクルーザー系合算。'},
  density:{t:'候補密度',d:'回答が生成されたセルで検出された車種数の平均。<b>高い＝AIがリスト形式で多くの車を挙げる車型</b>（露出機会が多い）／低い＝1〜2台しか挙がらないゼロサム（候補から落ちると完全不在）。'},
  sov:{t:'言及SoV',d:'その車型の非指名セルで検出された全言及のうち、トヨタ車が占める割合。競合を含む同じ土俵での占有率。'},
@@ -447,7 +516,7 @@ const FINDS = [
  {no:'FINDING 05', ev:'25 vs 56<small>%</small>', h:'AI面ごとに別の戦争をしている', p:'同じライズでもGemini言及56.2%に対しAIモードは25.0%。面ごとに引用も言及も傾向が違い、「どのAI面を攻めるか」を決めずに施策は打てない。', go:'car', gol:'車種オペで面別を見る'},
  {no:'FINDING 06', ev:'-4.4<small>pt</small>', h:'ミニバン2枚看板は露出を流入に変換できていない', p:'ヴォクシー・ノアはAI言及シェアに対しGA流入シェアが4.4pt低い。逆にランクル250は語られていないのに流入している（AI側の伸び代最大）。', go:'ga', gol:'GA×AIで見る'},
 ];
-const BNL = {F1:'露出機会',F2:'言及',F3:'第一想起',F4:'流入'};
+const BNL = {F1:'答えの厚み',F2:'名前が出た',F3:'一番手で出た',F4:'サイトに来た'};
 const FINDS2 = [
  {sev:'高', h:'ルーミー、OEM兄弟のトール（ダイハツ）に劣後', ev:'首位SoV 11%',
   p:'コンパクトトール型の第一想起シェアはトール35.8%・ソリオ31.6%に対しルーミー8.4%。単独露出もトール24セル vs ルーミー9セル。同一車ながらダイハツ名義が回答の主語になっている。', go:'seg', gol:'車型別で見る'},
@@ -515,7 +584,7 @@ function brandDonut(size){
   off+=len;
  }
  return `<svg viewBox="0 0 ${size} ${size}" style="display:block;width:100%;max-width:${size}px;height:auto;margin:0 auto">${segs}
- <text x="${c}" y="${c-4}" text-anchor="middle" fill="var(--tx)" font-size="${size*0.2}" font-weight="800" font-family="JetBrains Mono">${DATA.cross.brand_sov[0].sov}%</text>
+ <text x="${c}" y="${c-4}" text-anchor="middle" fill="var(--tx)" font-size="${size*0.2}" font-weight="800" font-family="JetBrains Mono" data-cnt="${DATA.cross.brand_sov[0].sov}" data-dec="1" data-suf="%">${DATA.cross.brand_sov[0].sov}%</text>
  <text x="${c}" y="${c+size*0.12}" text-anchor="middle" fill="var(--fa)" font-size="${size*0.06}">トヨタ言及シェア</text></svg>`;
 }
 function heroTrendChart(){
@@ -549,7 +618,7 @@ function renderHQ(){
  let h = `
  <div class="heroP">
   <div class="card hp" data-st="geo" role="button" tabindex="0"><h3>トヨタGEO総合スコア ${qm('geo')}</h3>
-   ${donutGauge(geo.score,210,gcol,geo.score+'<tspan font-size="15" fill="var(--fa)">/100</tspan>','7車型・競合込み実測')}
+   ${donutGauge(geo.score,210,gcol,`<tspan data-cnt="${geo.score}">${geo.score}</tspan><tspan font-size="15" fill="var(--fa)">/100</tspan>`,'7車型・競合込み実測')}
    <div class="hpfoot"><span>言及SoV <b class="num">${geo.sov.toFixed(1)}%</b></span><span>第一想起SoV <b class="num">${geo.fsov.toFixed(1)}%</b></span></div></div>
   <div class="card hp" data-st="sov" role="button" tabindex="0"><h3>ブランド別シェア（車型横断） ${qm('sov')}</h3>
    ${brandDonut(210)}
@@ -597,18 +666,18 @@ function renderHQ(){
      <svg viewBox="0 0 ${W} ${H}" style="display:block;width:100%;height:auto"><polyline points="${pts(o.series)}" fill="none" stroke="#2A3140" stroke-width="1"/><polyline points="${pts(m)}" fill="none" stroke="${col}" stroke-width="1.8"/></svg></button>`;
    }).join('')}</div></div>
  </div>
- <div class="sec"><h2>ファネル・ボトルネックボード ${qm('rule')}</h2><div class="ln"></div><span class="tag">露出機会→言及→第一想起→流入 ／ セルクリック=内訳 ／ 列見出し=並べ替え</span></div>
+ <div class="sec"><h2>ファネル・ボトルネックボード ${qm('rule')}</h2><div class="ln"></div><span class="tag">答えの厚み → 名前が出た → 一番手で出た → サイトに来た ／ セルクリック=内訳 ／ 列見出し=並べ替え</span></div>
  <div class="card" style="padding:12px 16px"><div class="tw"><table class="fb" id="fboard"><thead><tr>
   <th data-k="name">車種</th>
-  <th data-k="f1">露出機会 <span class="qmark" role="button" tabindex="0" data-help="f1">?</span></th>
-  <th data-k="f2">言及 <span class="qmark" role="button" tabindex="0" data-help="f2">?</span></th>
-  <th data-k="f3">第一想起 <span class="qmark" role="button" tabindex="0" data-help="f3">?</span></th>
-  <th data-k="f4">流入 <span class="qmark" role="button" tabindex="0" data-help="f4">?</span></th>
+  <th data-k="f1">① 答えの厚み <span class="qmark" role="button" tabindex="0" data-help="f1">?</span></th>
+  <th data-k="f2">② 名前が出た <span class="qmark" role="button" tabindex="0" data-help="f2">?</span></th>
+  <th data-k="f3">③ 一番手で出た <span class="qmark" role="button" tabindex="0" data-help="f3">?</span></th>
+  <th data-k="f4">④ サイトに来た <span class="qmark" role="button" tabindex="0" data-help="f4">?</span></th>
   <th data-k="bv" class="on">ボトルネック</th>
   <th>28日トレンド <span class="qmark" role="button" tabindex="0" data-help="trend">?</span></th>
   <th data-k="katarare">語られ指数 <span class="qmark" role="button" tabindex="0" data-help="katarare">?</span></th>
  </tr></thead><tbody></tbody></table></div>
- <div class="note">指数=8車種平均100。<b>ボトルネック=4段のうち最も低い段</b>（赤リング）。<b>「通過％」＝前の段からの通過率の実測</b>（言及セルの通過％＝露出機会のうち実際に言及された割合／第一想起の通過％＝言及のうち首位を取れた割合）。露出機会と言及の差分はこの通過％で読む。トレンドは日次スキャン(60クエリ)の言及ヒット実測。</div></div>
+ <div class="note"><b>4段の読み方</b>：①この車が挙がりうる質問×AI面で、AIがどれだけ厚く答えているか → ②その出番のうち何回で名前が出たか → ③名前が出た回のうち何回で一番手だったか → ④公式サイトにどれだけ来たか。<b>大きい数字は8車種平均=100の指数、その下が実数</b>（例「60/180回 33%」＝180回の出番のうち60回で名前が出た）。<b>ボトルネック=4段のうち最も低い段</b>（赤リング）。トレンドは日次スキャン(60クエリ)の言及ヒット実測。</div></div>
  <div class="sec"><h2>重点8車種</h2><div class="ln"></div><span class="tag">クリックで車種別へ</span></div>
  <div class="cargrid">${DATA.funnel.map(f=>{
   const k=f.katarare, kw=Math.min(Math.abs(k-100)/100*50,50);
@@ -680,7 +749,7 @@ function showStat(kind){
  }
  if(kind==='bneck'){
   openModal('ボトルネック分布 — どの段で詰まっているか', `<div class="tw"><table class="t"><thead><tr><th>車種</th><th>最も低い段</th><th>指数</th><th>意味</th></tr></thead><tbody>
-  ${[...DATA.funnel].sort((x,y)=>x.bv-y.bv).map(f=>`<tr><td>${esc(f.name)}</td><td><span class="bpill">${BNL[f.bottleneck]}</span></td><td class="num" style="color:var(--dn)">${f.bv}</td><td style="font-size:11px;color:var(--fa)">${{F1:'回答・引用の土台が薄い',F2:'候補に挙がらない',F3:'最初に書かれない',F4:'流入に変換できない'}[f.bottleneck]}</td></tr>`).join('')}
+  ${[...DATA.funnel].sort((x,y)=>x.bv-y.bv).map(f=>`<tr><td>${esc(f.name)}</td><td><span class="bpill">${BNL[f.bottleneck]}</span></td><td class="num" style="color:var(--dn)">${f.bv}</td><td style="font-size:11px;color:var(--fa)">${{F1:'根拠(引用)の土台が薄い',F2:'候補に挙がらない',F3:'一番手にならない',F4:'流入に変換できない'}[f.bottleneck]}</td></tr>`).join('')}
   </tbody></table></div>`);
  }
  if(kind==='segweak'){
@@ -702,11 +771,14 @@ function showStat(kind){
 function fcell(f,key,isB){
  const v=f[key];
  const w=Math.min(v,200)/200*100;
- let pass='';
- if(key==='f2'&&f.target_cells>0) pass=`<span class="pass">通過${Math.round(f.mention/f.target_cells*100)}%</span>`;
- if(key==='f3'&&f.mention>0) pass=`<span class="pass">通過${Math.round(f.first/f.mention*100)}%</span>`;
- return `<td class="clicky" data-car="${f.id}" data-fi="${key}"><div class="fcell ${isB?'bneck':''}" style="padding:3px 6px"><span class="fv" style="color:${v>=100?'var(--up)':v>=70?'var(--tx)':'var(--dn)'}">${v}</span>${pass}
- <div class="fbar"><em></em><i style="width:${w}%;background:${v>=100?'#3FD98F':'#FF5C7A'};opacity:.75"></i></div></div></td>`;
+ // 指数だけだと「前の段からどれだけ取りこぼしたか」が読めないので、実数と通過率を併記する。
+ let real='';
+ if(key==='f1') real=`<span class="realn">${f.target_cells}回の出番</span>`;
+ if(key==='f2') real=`<span class="realn">${f.mention}/${f.target_cells}回 <b>${f.target_cells>0?Math.round(f.mention/f.target_cells*100):'—'}%</b></span>`;
+ if(key==='f3') real=`<span class="realn">${f.first}/${f.mention}回 <b>${f.mention>0?Math.round(f.first/f.mention*100):'—'}%</b></span>`;
+ if(key==='f4') real=`<span class="realn">${fx(f.ga28)} sess</span>`;
+ return `<td class="clicky" data-car="${f.id}" data-fi="${key}"><div class="fcell ${isB?'bneck':''}" style="padding:3px 6px"><span class="fv" style="color:${v>=100?'var(--up)':v>=70?'var(--tx)':'var(--dn)'}">${v}</span>
+ <div class="fbar"><em></em><i style="width:${w}%;background:${v>=100?'#3FD98F':'#FF5C7A'};opacity:.75"></i></div>${real}</div></td>`;
 }
 function fboardRender(key){
  const rows=[...DATA.funnel].sort((a,b)=> key==='name'? a.name.localeCompare(b.name,'ja') : (a[key]??0)-(b[key]??0));
@@ -727,7 +799,7 @@ function showFunnelDetail(carId,key){
   openModal(`${f.name} — 語られ指数 ${f.katarare}`, `<div class="def"><span class="dh">実測の分解</span>AI言及シェア <b class="num">${f.ai_share}%</b> ÷ 販売台数シェア <b class="num">${f.sales_share}%</b> × 100 ＝ <b class="num" style="color:${f.katarare>=100?'var(--up)':'var(--dn)'}">${f.katarare}</b><br>月販 <b class="num">${fx(f.sales_m)}</b>台（自販連・全軽自協 実数）</div><div class="def"><span class="dh">DEFINITION</span>${HELP.katarare.d}</div>`);
   return;
  }
- const lab={f1:'露出機会',f2:'言及',f3:'第一想起',f4:'流入'}[key];
+ const lab={f1:'答えの厚み',f2:'名前が出た（言及）',f3:'一番手で出た（第一想起）',f4:'サイトに来た（流入）'}[key];
  let detail='';
  if(key==='f1') detail=`<div class="def"><span class="dh">この車の実測</span>回答生成率 <b class="num">${f.answered_rate}%</b> ／ 平均引用数 <b class="num">${f.avg_cites}</b>本/回答 ／ 対象 <b class="num">${f.target_cells}</b>セル</div>`;
  if(key==='f2') detail=`<div class="def"><span class="dh">この車の実測</span>言及 <b class="num">${f.mention}</b> / 分母 <b class="num">${f.target_cells}</b>セル ＝ <b class="num">${f.mr}%</b></div>
@@ -743,11 +815,72 @@ function showFunnelDetail(carId,key){
 /* ================= 02 車種オペレーション ================= */
 let curCar='raize';
 const BOTTLE_TXT = {
- F1:'回答は生成されるが、引用の厚みが取れていない（露出機会の問題）',
- F2:'そもそも候補リストに挙がらない（露出の問題）。比較記事・FAQの供給が先',
- F3:'言及はされるのに最初に書かれない（語順の問題）。使い分け文脈の明示で動かせる',
- F4:'AIに語られても toyota.jp へ流れていない（受け皿の問題）。回答内の引用リンク獲得が先',
+ F1:'AIは答えているが、根拠(引用)が薄い。土俵そのものが弱い',
+ F2:'AIが答えているのに候補リストに名前が入らない。比較記事・用途別FAQの供給が先',
+ F3:'名前は出るのに一番手にならない。「この用途ならこの車」の言い切りが足りない',
+ F4:'AIに語られても toyota.jp へ流れていない。受け皿と引用リンクの獲得が先',
 };
+/* ================= 打ち手ジェネレータ =================
+   ボトルネックの段 × 実測で最も弱いカテゴリ × 実際に先を越している競合 から、
+   「どこに」「何を置くか」を車種ごとに書き下ろす。推定値は使わず、
+   すべて画面に出ている実測値だけを根拠にする。 */
+const CAT_PLAY = {
+ safety:{what:'安全装備の“効く条件”表',detail:'Toyota Safety Sense の各機能が「どの速度域・どの状況で作動するか」を1枚の表に。AIは条件が書かれた表を引用しやすい'},
+ eco:{what:'実燃費レンジのページ',detail:'WLTCだけでなく「街乗り／高速／冬」の実燃費レンジをグレード別に明記。数値の幅があるとAIは根拠として引く'},
+ cost:{what:'年間維持費シミュレーション',detail:'税・保険・燃料・車検を年額で合算した表。「維持費が安い車」系の質問の受け皿になる'},
+ model:{what:'使い分け早見表',detail:'同社内・他社との違いを「どんな人ならどっち」で言い切る表。結論を先頭に置く'},
+ service:{what:'納期・保証・点検のFAQ',detail:'一問一答形式（Q見出し＋短い答え）。AIが最も引用しやすい構造'},
+ brand:{what:'開発者・設計思想の一次情報',detail:'他所が書けない一次情報はAIの引用先として強い'},
+ purchase:{what:'見積り・残価・下取りの手順ページ',detail:'購入検討フェーズの質問はディーラーサイトに取られやすい。公式に受け皿を作る'},
+};
+function playbook(f){
+ const cm=DATA.catmat[f.id]||{}, sm=DATA.surfmat[f.id]||{}, ci=(DATA.cite.car||{})[f.id]||{};
+ const cats=Object.entries(cm).filter(([k,v])=>v&&v.den>=8).sort((a,b)=>(a[1].mr??0)-(b[1].mr??0));
+ const weak=cats[0], weak2=cats[1];
+ const surfs=Object.entries(sm).filter(([k,v])=>v&&v.mr!=null).sort((a,b)=>a[1].mr-b[1].mr);
+ const weakSurf=surfs[0];
+ const rival=(f.win||[]).filter(w=>w[2]!=='toyota')[0];
+ const out=[];
+ const page=(f.url||`https://toyota.jp${f.slug||('/'+f.id)}/`).replace('https://','');
+ if(weak){
+  const pl=CAT_PLAY[weak[0]]||CAT_PLAY.model;
+  out.push({where:`${page} 配下に新規1ページ`,
+   what:pl.what,
+   why:`「${DATA.cat_labels[weak[0]]}」の質問で名前が出た率は <b>${weak[1].mr}%</b>（${weak[1].den}回中${weak[1].m??Math.round(weak[1].den*weak[1].mr/100)}回）＝8カテゴリで最も低い。${pl.detail}`,
+   kpi:`このカテゴリの言及率 ${weak[1].mr}% → 次周で改善したか`});
+ }
+ if(f.bottleneck==='F3'&&rival){
+  out.push({where:`${page} のトップ（ファーストビュー）と比較ページ`,
+   what:`「${esc(f.name)}を選ぶべき人」を先頭1文で言い切る`,
+   why:`名前は出るのに一番手は <b>${f.first}/${f.mention}回（${f.mention>0?Math.round(f.first/f.mention*100):0}%）</b>。この車型でAIが先に挙げるのは <b>${esc(rival[0])}</b>（${rival[1]}回）。AIは結論が先に書かれた文を引用して先頭に置く傾向がある`,
+   kpi:`一番手率 ${f.mention>0?Math.round(f.first/f.mention*100):0}% の改善`});
+ }
+ if(f.bottleneck==='F2'||(weak2&&weak2[1].mr<40)){
+  out.push({where:`toyota.jp の車種横断ページ（用途・条件から選ぶ導線）`,
+   what:`用途×条件のランディング（例「3列シート×5人家族×予算◯万」）`,
+   why:`AIが答えているのに候補に入らない出番が <b>${f.target_cells-f.mention}回</b>ある。指名されない質問は「用途と条件」で聞かれるため、車種名ではなく条件で引ける面を作る`,
+   kpi:`名前が出た率 ${f.target_cells>0?Math.round(f.mention/f.target_cells*100):0}% の改善`});
+ }
+ if(f.bottleneck==='F1'){
+  out.push({where:`${page} の主要ページ全体`,
+   what:`諸元・装備・価格を構造化データ（表＋FAQ）で明示`,
+   why:`AIが答えを作る際の根拠が薄い（回答生成率 ${f.answered_rate}% / 平均引用 ${f.avg_cites}本）。散文よりも表とQ&Aの方が引用されやすい`,
+   kpi:`平均引用数 ${f.avg_cites}本/回答 の改善`});
+ }
+ if(f.bottleneck==='F4'||(f.ai_share&&DATA.ga.find(g=>g.id===f.id)&&DATA.ga.find(g=>g.id===f.id).ga_share<f.ai_share)){
+  out.push({where:`${page}（AIの回答から直接来る想定の入口）`,
+   what:`回答の要約に載る短いリード文＋短縮しないURL構造`,
+   why:`AI上の言及シェア <b>${f.ai_share}%</b> に対して公式サイトのシェアは <b>${(DATA.ga.find(g=>g.id===f.id)||{}).ga_share??'—'}%</b>。語られてはいるが公式に戻せていない`,
+   kpi:`GAシェアと言及シェアの差`});
+ }
+ if(weakSurf&&weakSurf[1].mr!=null&&weakSurf[1].mr<25){
+  out.push({where:`外部（${SUR[weakSurf[0]]}が根拠にしているメディア）`,
+   what:`比較記事・ランキング記事への情報提供（一次データの提供）`,
+   why:`<b>${SUR[weakSurf[0]]}</b>での言及率が <b>${weakSurf[1].mr}%</b> と4面で最も低い。この面はメディア記事を根拠にする比率が高く、公式ページだけでは動かない`,
+   kpi:`${SUR[weakSurf[0]]}の言及率 ${weakSurf[1].mr}%`});
+ }
+ return out.slice(0,4);
+}
 function renderCAR(){
  const f = DATA.funnel.find(x=>x.id===curCar);
  const rank = [...DATA.funnel].sort((a,b)=>b.mr-a.mr).findIndex(x=>x.id===curCar)+1;
@@ -768,12 +901,19 @@ function renderCAR(){
    <div class="sc"><div class="v num">${fx(f.ga28)}</div><div class="l">GA4 28日 sess</div></div>
   </div>
   <div class="insight warnb" style="margin-top:10px"><span class="h">BOTTLENECK</span><b>${BNL[f.bottleneck]}（指数${f.bv}）が最深。</b>${BOTTLE_TXT[f.bottleneck]}</div>
+  <div class="card pbcard" style="margin-top:10px"><h3>打ち手 — どこに何を置くか</h3><div class="sub">この車の実測から出した具体案。数字はすべて画面上の実測値が根拠</div>
+   ${playbook(f).map((a,i)=>`<div class="pbrow"><span class="pbn">${i+1}</span><div>
+    <div class="pbwhat">${a.what}</div>
+    <div class="pbwhere">置き場所：<b>${esc(a.where)}</b></div>
+    <div class="pbwhy">${a.why}</div>
+    <div class="pbkpi">確認する指標：${a.kpi}</div></div></div>`).join('')||'<div class="note">この車は4段とも平均以上。現状維持で監視。</div>'}
+  </div>
   </div>
  </div>
  <div class="grid c2">
   <div class="card"><h3>ファネル — どこで落ちているか ${qm('rule')}</h3><div class="sub">8車種平均=100の指数。<b>行クリックで内訳</b></div>
    ${['f1','f2','f3','f4'].map((k,i)=>{
-    const v=f[k], lab=['露出機会','言及','第一想起','toyota.jp流入'][i], isB=f.bottleneck==='F'+(i+1);
+    const v=f[k], lab=['① 答えの厚み','② 名前が出た','③ 一番手で出た','④ サイトに来た'][i], isB=f.bottleneck==='F'+(i+1);
     const w=Math.min(v,200)/200*100;
     return `<div class="clicky" data-fk="${k}" style="display:grid;grid-template-columns:110px 1fr 44px;gap:10px;align-items:center;margin:9px 0">
      <span style="font-size:11px;color:${isB?'var(--dn)':'var(--mu)'};text-align:right;font-weight:${isB?700:400}">${lab}</span>
@@ -781,7 +921,7 @@ function renderCAR(){
       <i style="position:absolute;left:0;top:0;bottom:0;width:${w}%;border-radius:5px;background:${v>=100?'var(--up)':'var(--dn)'};opacity:.8"></i>
       <i style="position:absolute;left:50%;top:-3px;bottom:-3px;width:1px;background:var(--hl2)"></i></div>
      <span class="num" style="font-weight:700;color:${v>=100?'var(--up)':'var(--dn)'}">${v}</span></div>`}).join('')}
-   <div class="note">露出機会=回答生成率×引用数 ／ 言及=出現期待クエリでの登場率 ／ 第一想起=最初に書かれた率 ／ 流入=GA4実測</div>
+   <div class="note">①答えの厚み=回答生成率×引用数（AIがどれだけ厚く答えたか）／②名前が出た=出番のうち車名が登場した割合（${f.mention}/${f.target_cells}回）／③一番手で出た=言及のうち先頭に書かれた割合（${f.first}/${f.mention}回）／④サイトに来た=GA4実測</div>
    <div class="card" style="margin-top:12px;padding:12px 14px"><h3 style="margin-bottom:2px">得意・不得意レーダー — ${esc(f.name)} vs ${esc((DATA.segs.find(s=>s.seg===f.seg).rows.find(r=>r.id===DATA.rival_of[curCar])||{}).name||'競合')} ${qm('radar')}</h3>
    <div class="sub">カテゴリ別。<span id="rmode-l"></span>切替 →
     <button class="dtab on" id="rm-mr" style="padding:2px 10px;font-size:9.5px">言及率</button>
@@ -1059,9 +1199,10 @@ function renderCITE(){
    return `<tr class="hov"><td>${lab}</td><td class="num" style="color:var(--ac2);font-weight:700">${c.own}</td><td class="num" style="color:#E07B85;font-weight:700">${c.comp}</td><td class="num" style="color:var(--fa)">${fx(c.total)}</td><td class="num" style="color:var(--fa)">${Math.round(100*c.redir/Math.max(c.total,1))}%</td></tr>`}).join('')}
   </tbody></table></div>
   <div class="note">ChatGPTは引用が実URLで返るため公式判定が効く。Google系2面はリダイレクタ経由が大半で「不明」が支配的＝<b>この2面の引用実態はtitle復元（バックログ②）を実装するまで正確に語れない</b>。</div></div>
-  <div class="card" style="margin-top:12px"><h3>引用された toyota.jp のページ</h3><div class="sub">cited_car_pages 実測（件数／登場クエリ数）</div>
-  <div class="tw"><table class="t"><thead><tr><th>URL</th><th>引用</th><th>クエリ</th></tr></thead><tbody>
-  ${DATA.cite.pages.length? DATA.cite.pages.map(([u,n,q])=>`<tr class="hov"><td style="font-size:10.5px;max-width:300px;overflow:hidden;text-overflow:ellipsis"><a href="${esc(u)}" target="_blank" rel="noopener">${esc(u.replace('https://',''))}</a></td><td class="num">${n}</td><td class="num" style="color:var(--fa)">${q}</td></tr>`).join('') : '<tr><td colspan="3" style="color:var(--fa)">—</td></tr>'}
+  <div class="card" style="margin-top:12px"><h3>AIに引用された toyota.jp の車種ページ</h3><div class="sub">どの車の公式ページが根拠として引かれたか（引用件数／その車が登場したクエリ数）</div>
+  <div class="tw"><table class="t"><thead><tr><th>車種ページ</th><th>引用</th><th>クエリ</th></tr></thead><tbody>
+  ${DATA.cite.pages.length? DATA.cite.pages.map(p=>{const [u,nm,n,q]=p.length===4?p:[null,p[0],p[1],p[2]];
+   return `<tr class="hov"><td style="font-size:11px;max-width:300px;overflow:hidden;text-overflow:ellipsis">${u?`<a href="${esc(u)}" target="_blank" rel="noopener">${esc(nm)}<span style="color:var(--fa);font-family:var(--mono);font-size:9.5px;margin-left:6px">${esc(u.replace('https://',''))}</span></a>`:esc(nm)}</td><td class="num">${n}</td><td class="num" style="color:var(--fa)">${q}</td></tr>`}).join('') : '<tr><td colspan="3" style="color:var(--fa)">—</td></tr>'}
   </tbody></table></div></div></div>
  </div>
  <div class="sec"><h2>引用元カタログ — どんなサイトがAIの根拠になっているか</h2><div class="ln"></div><span class="tag">実URL判明分 ／ ドメインクリックで実際の引用リンク</span></div>

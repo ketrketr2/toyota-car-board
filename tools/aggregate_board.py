@@ -13,6 +13,13 @@ snaps = sorted(glob.glob(f'{GEO}/data/car/snapshots/*.json'))
 if not snaps:
     sys.exit('car-round のスナップショットが見つかりません（計測がまだ回っていない可能性）')
 snap = json.load(open(snaps[-1]))
+
+# 計測時のカタログではなく“現行の”カタログで引き直す（誤検出修正・ブランド統合を遡及適用）
+sys.path.insert(0, TOOLS)
+from redetect import redetect  # noqa: E402
+_n, _stat = redetect(snap['cells'], GEO)
+print(f"再検出(board): {_stat['cells_changed']}セル更新 (+{_stat['detections_added']} / -{_stat['detections_removed']})", flush=True)
+
 reg = yaml.safe_load(open(f'{GEO}/prompts/registry.yaml'))
 ga = json.load(open(f'{CW}/ga_f4.json'))
 core = json.load(open(f'{CW}/core_trend.json'))
