@@ -1198,7 +1198,7 @@ function renderCITE(){
    const c=DATA.cite.surf[sk];
    return `<tr class="hov"><td>${lab}</td><td class="num" style="color:var(--ac2);font-weight:700">${c.own}</td><td class="num" style="color:#E07B85;font-weight:700">${c.comp}</td><td class="num" style="color:var(--fa)">${fx(c.total)}</td><td class="num" style="color:var(--fa)">${Math.round(100*c.redir/Math.max(c.total,1))}%</td></tr>`}).join('')}
   </tbody></table></div>
-  <div class="note">ChatGPTは引用が実URLで返るため公式判定が効く。Google系2面はリダイレクタ経由が大半で「不明」が支配的＝<b>この2面の引用実態はtitle復元（バックログ②）を実装するまで正確に語れない</b>。</div></div>
+  <div class="note">Google系3面（Gemini／AIによる概要／AIモード）はリダイレクタ経由で引用が返るため、302を辿って実URLに復元している。<b>不明率0%＝4面すべて引用元を実名で特定済み</b>。ChatGPTは元々実URLで返る。</div></div>
   <div class="card" style="margin-top:12px"><h3>AIに引用された toyota.jp の車種ページ</h3><div class="sub">どの車の公式ページが根拠として引かれたか（引用件数／その車が登場したクエリ数）</div>
   <div class="tw"><table class="t"><thead><tr><th>車種ページ</th><th>引用</th><th>クエリ</th></tr></thead><tbody>
   ${DATA.cite.pages.length? DATA.cite.pages.map(p=>{const [u,nm,n,q]=p.length===4?p:[null,p[0],p[1],p[2]];
@@ -1214,7 +1214,7 @@ function renderCITE(){
   ${doms.slice(0,5).map(d=>`<button class="axbar clicky domrow" data-k="${k}" data-h="${esc(d.h)}" style="width:100%;background:none;border:none;padding:0;grid-template-columns:130px 1fr 36px"><span class="lab" style="font-family:var(--mono);font-size:9px;overflow:hidden;text-overflow:ellipsis">${esc(d.h)}</span><div class="bar"><i style="width:${Math.min(100,100*d.n/mx)}%;background:#5B87E0"></i></div><span class="val">${d.n}</span></button>`).join('')||'<div class="note">実URLでの検出なし（大半がリダイレクタ内）</div>'}
   </div>`}).join('')}
  </div>
- <div class="insight" style="margin-top:14px"><span class="h">SO WHAT</span><b>打ち手の優先順位はこの表から直接出る。</b>(1) 実URL判明分でトヨタ公式は最大勢力（toyota.jp ${a.top_hosts[0][1]}件）だが、車種の質問全体では公式引用率4.3%＝AIの根拠の95%以上を外部に依存。(2) 競合公式(402件)がトヨタ公式(381件)を上回っており、ホンダは車種数が少ないぶん1車種あたりの公式引用効率が高い。(3) 販売店サイト(${a.dealer}件)が公式の代わりに根拠として引かれている＝<b>toyota.jp側に「比較・価格・納期FAQ」の受け皿を作れば公式に引き戻せる余地</b>。(4) Google系2面の引用はtitle復元の実装（②）が先決。</div>`;
+ <div class="insight" style="margin-top:14px"><span class="h">SO WHAT</span><b>打ち手の優先順位はこの表から直接出る。</b>(1) 実URL判明分でトヨタ公式は最大勢力（toyota.jp ${a.top_hosts[0][1]}件）だが、車種の質問全体では公式引用率4.3%＝AIの根拠の95%以上を外部に依存。(2) 競合公式(402件)がトヨタ公式(381件)を上回っており、ホンダは車種数が少ないぶん1車種あたりの公式引用効率が高い。(3) 販売店サイト(${a.dealer}件)が公式の代わりに根拠として引かれている＝<b>toyota.jp側に「比較・価格・納期FAQ」の受け皿を作れば公式に引き戻せる余地</b>。(4) Google系3面の引用元を復元した結果、根拠の主役は<b>中古車サイト（ネクステージ・グーネット・カーセンサー）とYouTube</b>で、toyota.jpは少数派。ChatGPTだけが公式を厚く引く＝<b>面ごとに打ち手が違う</b>（ChatGPT=公式の情報設計、Google系=中古車・動画メディア側での露出）。</div>`;
  $('#v-cite').innerHTML=h;
  bindHelp('#v-cite');
  document.querySelectorAll('#v-cite .domrow').forEach(b=>b.addEventListener('click',()=>showDomain(b.dataset.k,b.dataset.h)));
