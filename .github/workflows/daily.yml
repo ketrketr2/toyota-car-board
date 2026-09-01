@@ -3,9 +3,12 @@ name: car-board-build
 # 車種別AI分析ボードの再ビルド。
 # 計測そのものは toyota-geo-board の car-round が担当し、ここは表示を作り直すだけ。
 # 07:35 JST（= 22:35 UTC 前日）。geo-board の日次(07:17)が終わった後に回す。
+# 第2便 08:50 JST は GitHub cron の遅延・ドロップ対策（2026-09-01朝に第1便が実際にドロップ）。
+# 差分がなければ何もコミットされないので二重実行しても安全。
 on:
   schedule:
     - cron: "35 22 * * *"
+    - cron: "50 23 * * *"
   workflow_dispatch:
   push:
     branches: [main]
