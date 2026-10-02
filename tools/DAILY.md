@@ -27,7 +27,7 @@
 | 名前 | 値 | 用途 |
 |---|---|---|
 | `WINDSOR_API_KEY` | Windsor.aiのAPIキー | GA4実測の取得 |
-| `CAR_GATE_KEY` | `toyota:toyota2026` | ページ暗号化の鍵素材（ID:パスワード） |
+| `CAR_GATE_KEY` | （GitHub Secrets のみに保存。ここに書かない） | ページ暗号化の鍵素材（ID:パスワード） |
 
 未登録の場合、ワークフローは何もせず正常終了する（古いページがそのまま残る）。
 
@@ -39,7 +39,7 @@ python3 tools/pull_ga_trend.py      # GA4とトレンド
 python3 tools/aggregate_board.py    # データ統合
 python3 tools/build.py              # plain.html
 node tools/verify.js                # 全ビュー検証
-CAR_GATE_KEY="toyota:toyota2026" python3 tools/encrypt.py
+CAR_GATE_KEY="<ID:パスワード>" python3 tools/encrypt.py
 mv index_new.html docs/index.html
 ```
 

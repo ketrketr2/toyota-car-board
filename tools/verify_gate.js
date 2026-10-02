@@ -8,16 +8,20 @@ const LAUNCH = fs.existsSync(PW_EXE) ? { executablePath: PW_EXE } : {};
   const errs = [];
   p.on('pageerror', e => errs.push('pageerror: ' + e.message));
   const GATE_FILE = process.env.GATE_FILE || 'index_new.html';
+  // 鍵素材は環境変数 CAR_GATE_KEY（"ID:パスワード"）から読む。リポジトリに値を書かない
+  const KEY = process.env.CAR_GATE_KEY || ''; const CUT = KEY.indexOf(':');
+  const GATE_ID = KEY.slice(0, CUT), GATE_PW = KEY.slice(CUT + 1);
+  if (CUT < 0) { console.error('CAR_GATE_KEY が未設定'); process.exit(1); }
   await p.goto('file://'+process.cwd()+'/'+GATE_FILE, { waitUntil: 'load' });
   await p.waitForTimeout(300);
   // 誤PW
-  await p.fill('#u', 'toyota'); await p.fill('#p', 'wrong');
+  await p.fill('#u', GATE_ID); await p.fill('#p', 'wrong');
   await p.click('#b'); await p.waitForTimeout(1800);
   const bad = await p.evaluate(() => document.querySelector('#e') ? document.querySelector('#e').textContent : '');
   console.log('誤PW時:', bad || '(空)');
   if (!bad.includes('正しくありません')) errs.push('wrong-pw did not show error');
   // 正PW
-  await p.fill('#p', 'toyota2026');
+  await p.fill('#p', GATE_PW);
   await p.click('#b'); await p.waitForTimeout(3200);
   const ok = await p.evaluate(() => ({
     main: (document.querySelector('#main')||document.querySelector('.wrap')||document.body).innerHTML.length,
