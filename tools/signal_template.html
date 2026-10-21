@@ -384,7 +384,7 @@ const SUR = {chatgpt:'ChatGPT',gemini:'Gemini',aio:'AIによる概要',aimode:'A
 const SEGL = {compact_tall:'コンパクトトール',minivan_s:'スモールミニバン',minivan_m:'ミドルミニバン',minivan_l:'ラージミニバン',compact_hb:'コンパクト',suv_compact:'コンパクトSUV',suv_off:'本格オフローダー/SUV'};
 const $ = s=>document.querySelector(s);
 const esc = s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const fx = n=>n.toLocaleString('ja-JP');
+const fx = n=>n==null?'—':n.toLocaleString('ja-JP');
 const tt = $('#tt');
 function ttMove(x,y){const w=tt.offsetWidth,h=tt.offsetHeight;let L=x+14,T=y+14;if(L+w>innerWidth-8)L=x-w-14;if(T+h>innerHeight-8)T=y-h-14;tt.style.left=L+'px';tt.style.top=T+'px'}
 function bindTT(el,html){el.addEventListener('mousemove',e=>{tt.innerHTML=typeof html==='function'?html():html;tt.style.display='block';ttMove(e.clientX,e.clientY)});el.addEventListener('mouseleave',()=>tt.style.display='none')}
@@ -541,7 +541,8 @@ function geoScoreAll(){
  for(const s of DATA.segs){
   for(const r of s.rows){ am+=r.mentions; af+=r.firsts; if(r.brand==='toyota'){tm+=r.mentions; tf+=r.firsts} }
  }
- return {sov:100*tm/am, fsov:100*tf/af, score: Math.round((100*tm/am + 100*tf/af)/2)};
+ const sov=am?100*tm/am:null, fsov=af?100*tf/af:null;
+ return {sov, fsov, score:sov!=null&&fsov!=null?Math.round((sov+fsov)/2):null};
 }
 function trendOfSeries(t){const n=t.length;const a=t.slice(Math.max(0,n-14)).reduce((x,y)=>x+y,0),b=t.slice(Math.max(0,n-28),Math.max(0,n-14)).reduce((x,y)=>x+y,0);return {a,b,pct:b>0?Math.round(100*(a-b)/b):null}}
 function ma7(t){return t.map((_,i)=>t.slice(Math.max(0,i-6),i+1).reduce((x,y)=>x+y,0)/Math.min(i+1,7))}
@@ -553,7 +554,7 @@ function trendOf(id){
 }
 function sparkSvg(series,w,h,color){
  const mx=Math.max(...series,1);
- const pts=series.map((v,i)=>`${(i/(series.length-1)*w).toFixed(1)},${(h-2-(v/mx)*(h-5)).toFixed(1)}`).join(' ');
+ const pts=series.map((v,i)=>`${(i/(series.length-1||1)*w).toFixed(1)},${(h-2-(v/mx)*(h-5)).toFixed(1)}`).join(' ');
  return `<svg viewBox="0 0 ${w} ${h}" style="display:block;width:${w}px;height:${h}px"><polyline points="${pts}" fill="none" stroke="${color}" stroke-width="1.5"/><circle cx="${w}" cy="${h-2-(series[series.length-1]/mx)*(h-5)}" r="2" fill="${color}"/></svg>`;
 }
 function trendChip(id){
@@ -567,6 +568,7 @@ function convOf(id){
  return Math.round(100*g.ga_share/g.ai_share);
 }
 function donutGauge(val,size,color,center,sub){
+ if(!Number.isFinite(val))return '<div class="note">対象データなし（未計測）</div>';
  const sw=15, r=(size-sw-6)/2, c=size/2, circ=2*Math.PI*r, frac=Math.min(val/100,1);
  return `<svg viewBox="0 0 ${size} ${size}" style="display:block;width:100%;max-width:${size}px;height:auto;margin:0 auto">
  <circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="var(--hl)" stroke-width="${sw}"/>
@@ -577,6 +579,7 @@ function donutGauge(val,size,color,center,sub){
 }
 function brandDonut(size){
  const data=DATA.cross.brand_sov;
+ if(!data.length)return '<div class="note">対象データなし（未計測）</div>';
  const cols={toyota:'#6C9EFF',honda:'#8A93A6',nissan:'#6E7887',suzuki:'#5A6478',daihatsu:'#4A5260',mitsubishi:'#3C4450'};
  const sw=17, r=(size-sw-6)/2, c=size/2, circ=2*Math.PI*r;
  let off=0, segs='';
@@ -622,7 +625,7 @@ function renderHQ(){
  <div class="heroP">
   <div class="card hp" data-st="geo" role="button" tabindex="0"><h3>トヨタGEO総合スコア ${qm('geo')}</h3>
    ${donutGauge(geo.score,210,gcol,`<tspan data-cnt="${geo.score}">${geo.score}</tspan><tspan font-size="15" fill="var(--fa)">/100</tspan>`,'7車型・競合込み実測')}
-   <div class="hpfoot"><span>言及SoV <b class="num">${geo.sov.toFixed(1)}%</b></span><span>第一想起SoV <b class="num">${geo.fsov.toFixed(1)}%</b></span></div></div>
+   <div class="hpfoot"><span>言及SoV <b class="num">${geo.sov==null?'—':geo.sov.toFixed(1)}%</b></span><span>第一想起SoV <b class="num">${geo.fsov==null?'—':geo.fsov.toFixed(1)}%</b></span></div></div>
   <div class="card hp" data-st="sov" role="button" tabindex="0"><h3>ブランド別シェア（車型横断） ${qm('sov')}</h3>
    ${brandDonut(210)}
    <div class="hpfoot">${DATA.cross.brand_sov.slice(0,3).map(b=>`<span><i class="lg" style="background:${b.brand==='toyota'?'#6C9EFF':'#8A93A6'}"></i>${BN[b.brand]} <b class="num">${b.sov}%</b></span>`).join('')}</div></div>
@@ -663,7 +666,7 @@ function renderHQ(){
     const o=DATA.ovtrend.find(x=>x.id===f.id); if(!o) return '';
     const tr=trendOfSeries(o.series); const col=tr.pct>=8?'#3FD98F':tr.pct<=-8?'#FF5C7A':'#8A93A6';
     const m=ma7(o.series), mx=Math.max(...o.series,1), W=150,H=44;
-    const pts=a=>a.map((v,i)=>`${(i/(a.length-1)*W).toFixed(1)},${(H-3-(v/mx)*(H-8)).toFixed(1)}`).join(' ');
+    const pts=a=>a.map((v,i)=>`${(i/(a.length-1||1)*W).toFixed(1)},${(H-3-(v/mx)*(H-8)).toFixed(1)}`).join(' ');
     return `<button class="ovrow clicky" data-id="${f.id}" style="background:var(--sf2);border:1px solid var(--hl);border-radius:9px;padding:7px 10px;text-align:left">
      <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:10.5px;font-weight:700">${esc(f.name)}</span><span class="num" style="font-size:10.5px;font-weight:700;color:${col}">${tr.pct!=null?(tr.pct>0?'+':'')+tr.pct+'%':'—'}</span></div>
      <svg viewBox="0 0 ${W} ${H}" style="display:block;width:100%;height:auto"><polyline points="${pts(o.series)}" fill="none" stroke="#2A3140" stroke-width="1"/><polyline points="${pts(m)}" fill="none" stroke="${col}" stroke-width="1.8"/></svg></button>`;
@@ -708,7 +711,7 @@ function showOvTrend(id){
  const o=DATA.ovtrend.find(x=>x.id===id); if(!o) return;
  const tr=trendOfSeries(o.series); const col=tr.pct>=8?'#3FD98F':tr.pct<=-8?'#FF5C7A':'#8A93A6';
  const m=ma7(o.series), mx=Math.max(...o.series,1), W=560,H=180,P=28;
- const X=i=>P+ i/(o.series.length-1)*(W-P*2), Y=v=>H-24-(v/mx)*(H-48);
+ const X=i=>P+ i/(o.series.length-1||1)*(W-P*2), Y=v=>H-24-(v/mx)*(H-48);
  let s=svgOpen(W,H);
  s+=`<line x1="${P}" y1="${Y(mx)}" x2="${W-P}" y2="${Y(mx)}" class="gline"/><text x="${P-4}" y="${Y(mx)+3}" text-anchor="end" fill="#545E70" font-size="9" font-family="JetBrains Mono">${mx}</text>`;
  s+=`<polyline points="${o.series.map((v,i)=>X(i)+','+Y(v)).join(' ')}" fill="none" stroke="#2A3140" stroke-width="1.2"/>`;
@@ -728,7 +731,7 @@ function showStat(kind){
  const a=DATA.cite.all, c=DATA.cross;
  if(kind==='geo'){
   const geo=geoScoreAll();
-  openModal('トヨタGEO総合スコア '+geo.score+'/100', `<p><b>定義:</b> 7車型の実測を合算した (言及SoV ${geo.sov.toFixed(1)}% + 第一想起SoV ${geo.fsov.toFixed(1)}%) ÷ 2。<b>競合を含む同じ土俵での占有率の平均</b>で、推定を含まない。</p>
+  openModal('トヨタGEO総合スコア '+fx(geo.score)+'/100', `<p><b>定義:</b> 7車型の実測を合算した (言及SoV ${geo.sov==null?'—':geo.sov.toFixed(1)}% + 第一想起SoV ${geo.fsov==null?'—':geo.fsov.toFixed(1)}%) ÷ 2。<b>競合を含む同じ土俵での占有率の平均</b>で、推定を含まない。</p>
   <div class="tw"><table class="t"><thead><tr><th>車型</th><th>GEOスコア</th><th>言及SoV</th><th>第一想起SoV</th></tr></thead><tbody>
   ${[...DATA.segs].map(s=>({...s,score:Math.round((s.toyota_sov+s.toyota_fsov)/2)})).sort((x,y)=>y.score-x.score).map(s=>`<tr><td>${s.label}</td>
    <td><div style="display:inline-block;width:${s.score*1.3}px;height:9px;background:${s.score>=60?'var(--up)':s.score>=40?'var(--wa)':'var(--dn)'};border-radius:3px;vertical-align:middle;margin-right:8px"></div><b class="num">${s.score}</b></td>
@@ -962,7 +965,7 @@ function renderCAR(){
  </div>
  <div class="card" style="margin-top:14px"><h3>この車の質問での引用元 ${qm('cite')}</h3>
   ${citeBar(ci)}
-  <div class="insight" style="margin-top:10px"><span class="h">READ</span>${ci.own>ci.comp?`トヨタ公式 <b class="num">${ci.own}</b> ＞ 競合公式 <b class="num">${ci.comp}</b>。`:`競合公式 <b class="num" style="color:var(--dn)">${ci.comp}</b> ＞ トヨタ公式 <b class="num">${ci.own}</b>。`}販売店 ${ci.dealer}件。引用の${Math.round(100*ci.redir/ci.total)}%は発信元不明。</div>
+  <div class="insight" style="margin-top:10px"><span class="h">READ</span>${ci.own>ci.comp?`トヨタ公式 <b class="num">${ci.own}</b> ＞ 競合公式 <b class="num">${ci.comp}</b>。`:`競合公式 <b class="num" style="color:var(--dn)">${ci.comp}</b> ＞ トヨタ公式 <b class="num">${ci.own}</b>。`}販売店 ${ci.dealer}件。引用の${ci.total?Math.round(100*ci.redir/ci.total):'—'}%は発信元不明。</div>
  </div>
  <div class="card" style="margin-top:14px"><h3>対象クエリ — 実際に聞かれている質問</h3><div class="sub">
   <button class="dtab on" id="qf-open" style="padding:3px 12px;font-size:10px">車名なしの質問のみ（${DATA.queries[curCar].filter(q=>!q.named).length}本）</button>
@@ -1142,7 +1145,7 @@ function renderSEG(){
  })()}</div>
  <div class="sec"><h2>兄弟車・OEMの共食い — AIはどちらの名前で語るか</h2><div class="ln"></div><span class="tag">同一回答内の共起実測</span></div>
  <div class="grid c3">${Object.values(DATA.oem).map(o=>{
-  const tot=o.both+o.onlya+o.onlyb;
+  const tot=o.both+o.onlya+o.onlyb||1;
   return `<div class="card"><h3>${o.a} × ${o.b}</h3><div class="sub">${o.note}</div>
   <div style="display:flex;height:20px;border-radius:6px;overflow:hidden;border:1px solid var(--hl2)">
    <div style="width:${100*o.onlya/tot}%;background:var(--ac)"></div>
@@ -1168,7 +1171,7 @@ function firstStack(s){
 }
 function densityChart(){
  const rows=[...DATA.segs.map(s=>({label:s.label,d:s.density})),{label:'車型横断（比較質問）',d:DATA.cross.density,x:1}].sort((a,b)=>b.d-a.d);
- const W=430,rH=25,H=rows.length*rH+8,maxd=Math.max(...rows.map(r=>r.d));
+ const W=430,rH=25,H=rows.length*rH+8,maxd=Math.max(...rows.map(r=>r.d),1);
  let s=svgOpen(W,H);
  rows.forEach((r,i)=>{
   const y=4+i*rH,w=(r.d/maxd)*(W-210);
@@ -1186,7 +1189,7 @@ function renderCITE(){
  let h = `<div class="sec" style="margin-top:4px"><h2>引用インテル — AIの「教科書」を誰が握っているか</h2><div class="ln"></div><span class="tag">${fx(a.total)} 引用 ／ 2026-08-28 実測</span></div>
  <div class="hstats" style="margin-bottom:14px">
   <div class="hs"><div class="v num">${fx(a.total)}</div><div class="l">引用リンク総数</div><div class="d">1,280セルから回収</div></div>
-  <div class="hs"><div class="v num" style="color:var(--dn)">${Math.round(100*a.redir/a.total)}<small>%</small></div><div class="l">発信元不明（リダイレクタ）</div><div class="d">google.com/goto・vertexaisearch 経由</div></div>
+  <div class="hs"><div class="v num" style="color:var(--dn)">${a.total?Math.round(100*a.redir/a.total):'—'}<small>%</small></div><div class="l">発信元不明（リダイレクタ）</div><div class="d">google.com/goto・vertexaisearch 経由</div></div>
   <div class="hs"><div class="v num" style="color:var(--ac2)">${a.own}<small> vs ${a.comp}</small></div><div class="l">トヨタ公式 vs 競合公式</div><div class="d" style="color:var(--dn)">公式引用で競合に負けている</div></div>
   <div class="hs"><div class="v num">${a.dealer}</div><div class="l">販売店サイトの引用</div><div class="d">公式でなく販社が根拠になる例</div></div>
  </div>
@@ -1223,7 +1226,7 @@ function renderCITE(){
   ${doms.slice(0,5).map(d=>`<button class="axbar clicky domrow" data-k="${k}" data-h="${esc(d.h)}" style="width:100%;background:none;border:none;padding:0;grid-template-columns:130px 1fr 36px"><span class="lab" style="font-family:var(--mono);font-size:9px;overflow:hidden;text-overflow:ellipsis">${esc(d.h)}</span><div class="bar"><i style="width:${Math.min(100,100*d.n/mx)}%;background:#5B87E0"></i></div><span class="val">${d.n}</span></button>`).join('')||'<div class="note">実URLでの検出なし（大半がリダイレクタ内）</div>'}
   </div>`}).join('')}
  </div>
- <div class="insight" style="margin-top:14px"><span class="h">SO WHAT</span><b>打ち手の優先順位はこの表から直接出る。</b>(1) 実URL判明分でトヨタ公式は最大勢力（toyota.jp ${a.top_hosts[0][1]}件）だが、車種の質問全体では公式引用率4.3%＝AIの根拠の95%以上を外部に依存。(2) 競合公式(402件)がトヨタ公式(381件)を上回っており、ホンダは車種数が少ないぶん1車種あたりの公式引用効率が高い。(3) 販売店サイト(${a.dealer}件)が公式の代わりに根拠として引かれている＝<b>toyota.jp側に「比較・価格・納期FAQ」の受け皿を作れば公式に引き戻せる余地</b>。(4) Google系3面の引用元を復元した結果、根拠の主役は<b>中古車サイト（ネクステージ・グーネット・カーセンサー）とYouTube</b>で、toyota.jpは少数派。ChatGPTだけが公式を厚く引く＝<b>面ごとに打ち手が違う</b>（ChatGPT=公式の情報設計、Google系=中古車・動画メディア側での露出）。</div>`;
+ <div class="insight" style="margin-top:14px"><span class="h">SO WHAT</span><b>打ち手の優先順位はこの表から直接出る。</b>(1) 実URL判明分でトヨタ公式は最大勢力（toyota.jp ${a.top_hosts[0]?.[1]??'—'}件）だが、車種の質問全体では公式引用率4.3%＝AIの根拠の95%以上を外部に依存。(2) 競合公式(402件)がトヨタ公式(381件)を上回っており、ホンダは車種数が少ないぶん1車種あたりの公式引用効率が高い。(3) 販売店サイト(${a.dealer}件)が公式の代わりに根拠として引かれている＝<b>toyota.jp側に「比較・価格・納期FAQ」の受け皿を作れば公式に引き戻せる余地</b>。(4) Google系3面の引用元を復元した結果、根拠の主役は<b>中古車サイト（ネクステージ・グーネット・カーセンサー）とYouTube</b>で、toyota.jpは少数派。ChatGPTだけが公式を厚く引く＝<b>面ごとに打ち手が違う</b>（ChatGPT=公式の情報設計、Google系=中古車・動画メディア側での露出）。</div>`;
  $('#v-cite').innerHTML=h;
  bindHelp('#v-cite');
  document.querySelectorAll('#v-cite .domrow').forEach(b=>b.addEventListener('click',()=>showDomain(b.dataset.k,b.dataset.h)));
@@ -1256,7 +1259,7 @@ function renderGA(){
    <div style="height:9px;border-radius:4px;background:var(--hl);position:relative">
     <i style="position:absolute;left:0;top:0;bottom:0;width:${w}%;border-radius:4px;background:${c>=100?'var(--up)':'var(--dn)'};opacity:.8"></i>
     <i style="position:absolute;left:50%;top:-3px;bottom:-3px;width:1px;background:var(--hl2)"></i></div>
-   <span class="num" style="font-weight:700;color:${c>=100?'var(--up)':'var(--dn)'}">${c}</span></div>`}).join('')}
+   <span class="num" style="font-weight:700;color:${c>=100?'var(--up)':'var(--dn)'}">${c??'—'}</span></div>`}).join('')}
  <div class="note">100未満＝AI上の露出が toyota.jp 流入に変換できていない（回答内の引用リンク獲得＝受け皿が課題）。</div></div>
  <div class="card" style="margin-top:14px"><h3>日次トレンド — AI言及ヒット × GAセッション</h3><div class="sub">左軸: 日次スキャン(60クエリ)のAI言及ヒット（8/1〜8/31実測）／右軸: GA4セッション（28日実測）</div>
  <div id="carchips" style="display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 14px"></div>
@@ -1272,7 +1275,9 @@ function renderGA(){
 }
 function gaScatter(){
  const W=640,H=430,P={l:56,r:26,t:26,b:46};
- const xs=DATA.ga.map(g=>g.ai_share), ys=DATA.ga.map(g=>g.ga_share);
+ const measured=DATA.ga.filter(g=>Number.isFinite(g.ai_share)&&Number.isFinite(g.ga_share));
+ if(!measured.length)return '<div class="note">対象データなし（未計測）</div>';
+ const xs=measured.map(g=>g.ai_share), ys=measured.map(g=>g.ga_share);
  const mn=Math.min(...xs,...ys)-2, mx=Math.max(...xs,...ys)+2;
  const X=v=>P.l+(v-mn)/(mx-mn)*(W-P.l-P.r), Y=v=>H-P.b-(v-mn)/(mx-mn)*(H-P.t-P.b);
  let s=svgOpen(W,H);
@@ -1285,6 +1290,7 @@ function gaScatter(){
  s+=`<text x="${W-P.r-8}" y="${H-P.b-10}" text-anchor="end" fill="#98A2B3" font-size="10">語られるのに来ていない →</text>`;
  const placed=[];
  DATA.ga.forEach((g,i)=>{
+  if(!Number.isFinite(g.ai_share)||!Number.isFinite(g.ga_share))return;
   const r = 7+Math.sqrt(g.ga28)/60;
   const under = g.ga_share < g.ai_share;
   s+=`<circle class="gp" data-i="${i}" cx="${X(g.ai_share)}" cy="${Y(g.ga_share)}" r="${r}" fill="${under?'#FF5C7A':'#6C9EFF'}" opacity="0.82" stroke="#0B0D11" stroke-width="1.5"/>`;
@@ -1298,7 +1304,7 @@ function gaScatter(){
  return s+'</svg>';
 }
 function gaGapChart(){
- const rows=[...DATA.ga].map(g=>({...g,gap:+(g.ga_share-g.ai_share).toFixed(1)})).sort((a,b)=>a.gap-b.gap);
+ const rows=DATA.ga.filter(g=>Number.isFinite(g.ai_share)&&Number.isFinite(g.ga_share)).map(g=>({...g,gap:+(g.ga_share-g.ai_share).toFixed(1)})).sort((a,b)=>a.gap-b.gap);
  const W=430,rH=28,H=rows.length*rH+30,mid=W*0.58,span=W*0.24,maxg=Math.max(...rows.map(r=>Math.abs(r.gap)),1);
  let s=svgOpen(W,H);
  s+=`<line x1="${mid}" y1="6" x2="${mid}" y2="${H-22}" stroke="#2A3140" stroke-width="1.2"/>`;
@@ -1319,7 +1325,7 @@ function renderDual(){
  const maxT=Math.max(...t.filter(v=>v!=null),1);
  const gaIdx = {}; g.ga_dates.forEach((d,i)=>gaIdx[d]=g.ga_sess[i]);
  const gv = days.map(d=>gaIdx[d] ?? null), maxG=Math.max(...gv.filter(v=>v!=null),1);
- const X=i=>P.l+i/(days.length-1)*(W-P.l-P.r);
+ const X=i=>P.l+i/(days.length-1||1)*(W-P.l-P.r);
  const YT=v=>H-P.b-(v/maxT)*(H-P.t-P.b), YG=v=>H-P.b-(v/maxG)*(H-P.t-P.b);
  let s=svgOpen(W,H);
  [0.5,1].forEach(f=>{s+=`<line class="gline" x1="${P.l}" y1="${YT(maxT*f)}" x2="${W-P.r}" y2="${YT(maxT*f)}"/>`});
@@ -1331,7 +1337,7 @@ function renderDual(){
  s+=`<polyline points="${tPts}" fill="none" stroke="#6C9EFF" stroke-width="2.2"/>`;
  for(let i=t.length-1;i>=0;i--){ if(t[i]!=null){s+=`<circle cx="${X(i)}" cy="${YT(t[i])}" r="3.5" fill="#6C9EFF"/>`;break}}
  days.forEach((d,i)=>{ if(i%5===0){s+=`<text x="${X(i)}" y="${H-8}" text-anchor="middle" fill="#545E70" font-size="9" font-family="JetBrains Mono">${d.slice(5)}</text>`}
-  s+=`<rect class="dd" data-i="${i}" x="${X(i)-((W-P.l-P.r)/(days.length-1))/2}" y="${P.t}" width="${(W-P.l-P.r)/(days.length-1)}" height="${H-P.t-P.b}" fill="transparent"/>`});
+  s+=`<rect class="dd" data-i="${i}" x="${X(i)-((W-P.l-P.r)/(days.length-1||1))/2}" y="${P.t}" width="${(W-P.l-P.r)/(days.length-1||1)}" height="${H-P.t-P.b}" fill="transparent"/>`});
  s+='</svg>';
  $('#dualwrap').innerHTML = s + `<div class="legend"><span><i style="background:#6C9EFF"></i>AI言及ヒット（日次スキャン実測）</span><span><i style="background:#545E70"></i>GA4セッション（右軸）</span><span style="color:var(--fa)">GA未計測日は線を引かない</span></div>`;
  document.querySelectorAll('#dualwrap .dd').forEach(r=>{
