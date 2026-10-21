@@ -6,6 +6,7 @@ import os
 from pathlib import Path
 import runpy
 import sys
+import subprocess
 import tempfile
 import types
 import unittest
@@ -45,7 +46,11 @@ class EmptyTargetsTest(unittest.TestCase):
                 date='2026-10-21', api_cost=dict(calls=len(cells), usd=1),
                 surfaces=['chatgpt', 'gemini'], cells=cells))
             cfg = dict(focus=[dict(id=c, name=c, seg=s) for c, s in zip(FOCUS, SEGS)],
-                       rivals=[], segs={s: s for s in SEGS})
+                       rivals=[dict(id=c, name=c, brand='toyota') for c in
+                               ['thor', 'solio', 'delica_mini', 'freed', 'serena', 'stepwgn',
+                                'vellfire', 'elgrand', 'yaris', 'fit', 'note', 'yariscross',
+                                'rocky', 'crossbee', 'wrv', 'rav4', 'jimny_sierra', 'xtrail', 'outlander']],
+                       segs={s: s for s in SEGS})
             (geo / 'config/cars.yaml').write_text(yaml.safe_dump(cfg))
             (geo / 'config/models.yaml').write_text('own: []\n')
             (geo / 'prompts/registry.yaml').write_text(yaml.safe_dump(dict(
@@ -64,6 +69,9 @@ class EmptyTargetsTest(unittest.TestCase):
                     patch.object(sys, 'path', sys.path.copy()), contextlib.redirect_stdout(io.StringIO()):
                 runpy.run_path(str(ROOT / 'tools/aggregate_board.py'), run_name='__main__')
                 runpy.run_path(str(ROOT / 'tools/aggregate_signal.py'), run_name='__main__')
+            rendered = subprocess.run(['node', str(ROOT / 'tests/test_empty_render.js'),
+                                      str(board_path), str(signal_path)], capture_output=True, text=True)
+            self.assertEqual(rendered.returncode, 0, rendered.stderr)
             return json.loads(board_path.read_text()), json.loads(signal_path.read_text())
 
     def test_normal_values_unchanged(self):

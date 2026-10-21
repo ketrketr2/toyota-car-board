@@ -14,7 +14,7 @@ function idxCol(v){return v==null?'var(--tx3)':v>=115?'var(--gn)':v>=85?'var(--a
 function spark(vals,w,h,color,fill){
  if(!vals||!vals.length)return '';
  const mx=Math.max(...vals,1),mn=0;
- const pts=vals.map((v,i)=>[(i/(vals.length-1))*(w-4)+2, h-3-((v-mn)/(mx-mn||1))*(h-8)]);
+ const pts=vals.map((v,i)=>[(i/(vals.length-1||1))*(w-4)+2, h-3-((v-mn)/(mx-mn||1))*(h-8)]);
  const d='M'+pts.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join('L');
  const area=d+`L${pts[pts.length-1][0]},${h-2}L${pts[0][0]},${h-2}Z`;
  return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">${fill?`<path d="${area}" fill="${color}" opacity=".12"/>`:''}<path d="${d}" fill="none" stroke="${color}" stroke-width="2" stroke-linejoin="round"/></svg>`;
@@ -67,8 +67,10 @@ function donut(parts,size,label,sub){
 }
 function scatter(pts,w,h){
  // pts: [{x,y,label,col,id}] x=販売シェア y=AI言及シェア
+ pts=pts.filter(p=>Number.isFinite(p.x)&&Number.isFinite(p.y));
+ if(!pts.length)return '<div class="sub2">対象データなし（未計測）</div>';
  const pad={l:44,r:16,t:14,b:30};
- const mx=Math.max(...pts.map(p=>Math.max(p.x,p.y)))*1.15;
+ const mx=Math.max(...pts.map(p=>Math.max(p.x,p.y)),1)*1.15;
  const X=v=>pad.l+(v/mx)*(w-pad.l-pad.r), Y=v=>h-pad.b-(v/mx)*(h-pad.t-pad.b);
  let g=`<line x1="${X(0)}" y1="${Y(0)}" x2="${X(mx)}" y2="${Y(mx)}" stroke="#2B3D5E" stroke-dasharray="5 5"/>`;
  g+=`<text x="${X(mx*0.86)}" y="${Y(mx*0.86)-9}" font-size="9" fill="#5F7291" text-anchor="end" transform="rotate(-33 ${X(mx*0.86)} ${Y(mx*0.86)-9})">語られ指数100（販売＝AI言及）</text>`;
