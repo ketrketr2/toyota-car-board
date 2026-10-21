@@ -1,0 +1,27 @@
+name: 集計・欠測描画検証
+on:
+  push:
+    branches: [fix/empty-target-rendering]
+  pull_request:
+    paths: ["tools/**", "tests/**", ".github/workflows/**"]
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install pyyaml
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - run: npm install --no-save playwright
+      - run: npx playwright install --with-deps chromium
+      - name: 集計と欠測時のPC・スマホ描画を検証
+        env:
+          EMPTY_RENDER_BROWSER: "1"
+        run: python -W ignore::ResourceWarning -m unittest discover -s tests -v

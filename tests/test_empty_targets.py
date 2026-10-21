@@ -72,6 +72,13 @@ class EmptyTargetsTest(unittest.TestCase):
             rendered = subprocess.run(['node', str(ROOT / 'tests/test_empty_render.js'),
                                       str(board_path), str(signal_path)], capture_output=True, text=True)
             self.assertEqual(rendered.returncode, 0, rendered.stderr)
+            if os.environ.get('EMPTY_RENDER_BROWSER') == '1':
+                for script in ['build.py', 'build_signal.py']:
+                    subprocess.run([sys.executable, str(ROOT / 'tools' / script)],
+                                   cwd=base, env={**os.environ, **env}, check=True, capture_output=True)
+                browser = subprocess.run(['node', str(ROOT / 'tests/verify_empty_render_browser.js'),
+                                          str(base)], capture_output=True, text=True)
+                self.assertEqual(browser.returncode, 0, browser.stderr)
             return json.loads(board_path.read_text()), json.loads(signal_path.read_text())
 
     def test_normal_values_unchanged(self):
