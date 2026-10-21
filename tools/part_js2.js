@@ -2,9 +2,9 @@
 function rCar(cid){
  const d=D.cars[cid];
  const F=[
-  {k:'F1',n:'露出機会',s:'AI回答生成率×引用量',idx:d.f1i,raw:`生成${d.answered_rate}%・引用${d.avg_cites}件/回答`},
-  {k:'F2',n:'車種言及',s:'出るべき質問で名前が出た率',idx:d.f2i,raw:`${d.mr}%（${d.mention}/${d.target_cells}回答）`},
-  {k:'F3',n:'第一想起',s:'言及の中で先頭に書かれた率',idx:d.f3i,raw:`${d.fr}%（${d.first}回）`},
+  {k:'F1',n:'露出機会',s:'AI回答生成率×引用量',idx:d.f1i,raw:`生成${pct(d.answered_rate)}・引用${fmt(d.avg_cites)}件/回答`},
+  {k:'F2',n:'車種言及',s:'出るべき質問で名前が出た率',idx:d.f2i,raw:`${pct(d.mr)}（${d.mention}/${d.target_cells}回答）`},
+  {k:'F3',n:'第一想起',s:'言及の中で先頭に書かれた率',idx:d.f3i,raw:`${pct(d.fr)}（${d.first}回）`},
   {k:'F4',n:'流入（GA4）',s:'toyota.jp車種ページ 28日',idx:d.f4i,raw:`${fmt(d.ga28)} sess`},
  ];
  let h=`<div class="crumb fade"><h2>${d.name}<small>${d.seg_label} ｜ 対象クエリ${d.queries.length}本（うち指名${d.n_named}本）</small></h2>

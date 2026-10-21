@@ -54,7 +54,8 @@ for cid in FOCUS:
     # F1: AI回答の生成率と平均引用数（露出機会の実測プロキシ）
     answered = [c for c in tgt if (c['answer'] or '').strip()]
     cites_n = [len([x for x in c['citations'] if x['host'] not in NOISE]) for c in answered]
-    f1_raw = (len(answered) / len(tgt)) * (statistics.mean(cites_n) if cites_n else 0)
+    # 対象なしは未計測。実測ゼロと区別し、車種平均の分母からも除外する。
+    f1_raw = (len(answered) / len(tgt)) * (statistics.mean(cites_n) if cites_n else 0) if tgt else None
     # 競合勝敗
     win = collections.Counter()
     riv_seen = collections.Counter()
@@ -123,9 +124,9 @@ for cid in FOCUS:
         "target_cells": len(tgt), "mention": len(m), "first": len(first),
         "mr": round(len(m) / len(tgt) * 100, 1) if tgt else None,
         "fr": round(len(first) / len(m) * 100, 1) if m else None,
-        "f1_raw": round(f1_raw, 2),
+        "f1_raw": round(f1_raw, 2) if f1_raw is not None else None,
         "answered_rate": round(len(answered) / len(tgt) * 100, 1) if tgt else None,
-        "avg_cites": round(statistics.mean(cites_n), 2) if cites_n else 0,
+        "avg_cites": (round(statistics.mean(cites_n), 2) if cites_n else 0) if tgt else None,
         "win": [[ALLNAME.get(k, k), v, RIVAL_BRAND.get(k, 'toyota') if k not in NAME else 'toyota', k] for k, v in win.most_common(8)],
         "riv_seen": [[ALLNAME.get(k, k), v] for k, v in riv_seen.most_common(6)],
         "surf": surf,
@@ -149,7 +150,7 @@ F1i = idx({c: out_cars[c]['f1_raw'] for c in FOCUS})
 F2i = idx({c: out_cars[c]['mr'] for c in FOCUS})
 F3i = idx({c: out_cars[c]['fr'] for c in FOCUS})
 F4i = idx({c: out_cars[c]['ga28'] for c in FOCUS})
-EXPi = idx({c: (out_cars[c]['mr'] or 0) * SEED[c] for c in FOCUS})  # 推定露出 = 言及率×検索需要
+EXPi = idx({c: out_cars[c]['mr'] * SEED[c] if out_cars[c]['mr'] is not None else None for c in FOCUS})  # 推定露出 = 言及率×検索需要
 
 # 語られ指数 = AI言及シェア ÷ 販売台数シェア ×100（8車内シェア・2026-07実売）
 SKEY = {"lc250": "landcruiser"}
@@ -175,6 +176,10 @@ for c in FOCUS:
 for c in FOCUS:
     d = out_cars[c]
     ins = {"now": [], "issue": [], "action": []}
+    if not d["target_cells"]:
+        ins["now"].append("対象セルなし。AI指標は未計測のため評価できません。")
+        out_cars[c]["insight"] = ins
+        continue
     ins["now"].append(f"出現すべき{d['target_cells']}回答のうち言及{d['mention']}件（{d['mr']}%）、うち第一想起{d['fr']}%。")
     if d['katarare'] is not None:
         if d['katarare'] < 70:
@@ -265,4 +270,4 @@ sz = len(json.dumps(board, ensure_ascii=False))
 print(f'board_data.json {sz/1024:.0f}KB')
 for c in FOCUS:
     d = out_cars[c]
-    print(f"{c:<8} F1i{d['f1i']:>4} F2i{d['f2i']:>4} F3i{d['f3i']:>4} F4i{d['f4i']:>4} 語られ{str(d['katarare']):>5} 売{str(d['sales_m']):>7} 4分類{d['cite4']}")
+    print(f"{c:<8} F1i{str(d['f1i']):>4} F2i{str(d['f2i']):>4} F3i{str(d['f3i']):>4} F4i{str(d['f4i']):>4} 語られ{str(d['katarare']):>5} 売{str(d['sales_m']):>7} 4分類{d['cite4']}")

@@ -519,7 +519,7 @@ const FINDS = [
  {no:'FINDING 05', ev:'25 vs 56<small>%</small>', h:'AI面ごとに別の戦争をしている', p:'同じライズでもGemini言及56.2%に対しAIモードは25.0%。面ごとに引用も言及も傾向が違い、「どのAI面を攻めるか」を決めずに施策は打てない。', go:'car', gol:'車種オペで面別を見る'},
  {no:'FINDING 06', ev:'-4.4<small>pt</small>', h:'ミニバン2枚看板は露出を流入に変換できていない', p:'ヴォクシー・ノアはAI言及シェアに対しGA流入シェアが4.4pt低い。逆にランクル250は語られていないのに流入している（AI側の伸び代最大）。', go:'ga', gol:'GA×AIで見る'},
 ];
-const BNL = {F2:'出現率',F3:'第一出現',F4:'JP流入'};
+const BNL = {null:'未計測',F2:'出現率',F3:'第一出現',F4:'JP流入'};
 const FINDS2 = [
  {sev:'高', h:'ルーミー、OEM兄弟のトール（ダイハツ）に劣後', ev:'首位SoV 11%',
   p:'コンパクトトール型の第一想起シェアはトール35.8%・ソリオ31.6%に対しルーミー8.4%。単独露出もトール24セル vs ルーミー9セル。同一車ながらダイハツ名義が回答の主語になっている。', go:'seg', gol:'車型別で見る'},
@@ -751,7 +751,7 @@ function showStat(kind){
  }
  if(kind==='bneck'){
   openModal('ボトルネック分布 — どの段で詰まっているか', `<div class="tw"><table class="t"><thead><tr><th>車種</th><th>最も低い段</th><th>指数</th><th>意味</th></tr></thead><tbody>
-  ${[...DATA.funnel].sort((x,y)=>x.bv-y.bv).map(f=>`<tr><td>${esc(f.name)}</td><td><span class="bpill">${BNL[f.bottleneck]}</span></td><td class="num" style="color:var(--dn)">${f.bv}</td><td style="font-size:11px;color:var(--fa)">${{F1:'根拠(引用)の土台が薄い',F2:'候補に挙がらない',F3:'一番手にならない',F4:'流入に変換できない'}[f.bottleneck]}</td></tr>`).join('')}
+  ${[...DATA.funnel].sort((x,y)=>x.bv-y.bv).map(f=>`<tr><td>${esc(f.name)}</td><td><span class="bpill">${BNL[f.bottleneck]}</span></td><td class="num" style="color:var(--dn)">${f.bv??'—'}</td><td style="font-size:11px;color:var(--fa)">${{F1:'根拠(引用)の土台が薄い',F2:'候補に挙がらない',F3:'一番手にならない',F4:'流入に変換できない'}[f.bottleneck]}</td></tr>`).join('')}
   </tbody></table></div>`);
  }
  if(kind==='segweak'){
@@ -787,7 +787,7 @@ function fboardRender(key){
  $('#fboard tbody').innerHTML = rows.map(f=>`<tr class="hov" data-car="${f.id}">
   <td><span class="carcell">${carThumb(f.id,f.name,'toyota')}<span><span class="nm">${esc(f.name)}</span><br><span class="sg">${SEGL[f.seg]||''}</span></span></span></td>
   ${fcell(f,'f2',f.weak!==false&&f.bottleneck==='F2')}${fcell(f,'f3',f.weak!==false&&f.bottleneck==='F3')}${fcell(f,'f4',f.weak!==false&&f.bottleneck==='F4')}
-  <td>${f.weak===false?'<span class="bpill okpill">弱点なし</span>':`<span class="bpill">${BNL[f.bottleneck]} = ${f.bv}</span>`}</td>
+  <td>${['f2','f3','f4'].some(k=>f[k]==null)?'<span class="bpill">未計測項目あり</span>':f.weak===false?'<span class="bpill okpill">弱点なし</span>':`<span class="bpill">${BNL[f.bottleneck]} = ${f.bv??'—'}</span>`}</td>
   <td>${trendChip(f.id)}</td>
   <td class="clicky" data-car="${f.id}" data-fi="katarare"><span class="num" style="color:${f.katarare>=100?'var(--up)':'var(--dn)'};font-weight:700">${f.katarare}</span></td></tr>`).join('');
  document.querySelectorAll('#fboard tbody tr').forEach(tr=>tr.addEventListener('click',()=>{curCar=tr.dataset.car;renderCAR();switchTab('car')}));
@@ -898,16 +898,16 @@ function renderCAR(){
  <div class="carsel">${DATA.funnel.map(x=>`<button class="cs ${x.id===curCar?'on':''}" data-car="${x.id}">${IMG[x.id]?`<img src="${IMG[x.id]}" alt="">`:''}<span>${esc(x.name)}</span></button>`).join('')}</div>
  <div class="carhead">
   <div class="carimgbig">${carThumb(curCar,f.name,'toyota',true)}</div>
-  <div><div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap"><span style="font-size:23px;font-weight:700">${esc(f.name)}</span><span class="chip">${SEGL[f.seg]}</span><span class="bpill">弱点: ${BNL[f.bottleneck]}（指数${f.bv}）</span><span style="margin-left:auto">${trendChip(curCar)}</span></div>
+  <div><div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap"><span style="font-size:23px;font-weight:700">${esc(f.name)}</span><span class="chip">${SEGL[f.seg]}</span><span class="bpill">弱点: ${BNL[f.bottleneck]}（指数${f.bv??'—'}）</span><span style="margin-left:auto">${trendChip(curCar)}</span></div>
   <div class="statchips">
-   <div class="sc"><div class="v num">${f.mr}<small>%</small></div><div class="l">出現率（${rank}/8位）</div></div>
-   <div class="sc"><div class="v num">${f.fr}<small>%</small></div><div class="l">第一出現率（${frank}/8位）</div></div>
+   <div class="sc"><div class="v num">${f.mr??'—'}<small>%</small></div><div class="l">出現率（${rank}/8位）</div></div>
+   <div class="sc"><div class="v num">${f.fr??'—'}<small>%</small></div><div class="l">第一出現率（${frank}/8位）</div></div>
    <div class="sc"><div class="v num" style="color:${f.pos_rate>=25?'var(--up)':'var(--tx)'}">${f.pos_rate??'—'}<small>%</small></div><div class="l">好意的出現率 <span class="qmark" role="button" tabindex="0" data-help="pos">?</span></div></div>
-   <div class="sc"><div class="v num" style="color:${f.katarare>=100?'var(--up)':'var(--dn)'}">${f.katarare}</div><div class="l">販売比AI出現指数</div></div>
+   <div class="sc"><div class="v num" style="color:${f.katarare>=100?'var(--up)':'var(--dn)'}">${f.katarare??'—'}</div><div class="l">販売比AI出現指数</div></div>
    <div class="sc"><div class="v num" style="color:${conv>=100?'var(--up)':'var(--dn)'}">${conv??'—'}</div><div class="l">AI→流入変換 <span class="qmark" role="button" tabindex="0" data-help="conv">?</span></div></div>
    <div class="sc"><div class="v num">${fx(f.ga28)}</div><div class="l">GA4 28日 sess</div></div>
   </div>
-  ${f.weak===false?`<div class="insight" style="margin-top:10px"><span class="h">STATUS</span><b>3段とも8車種平均以上。</b>明確な弱点は無い。最も低いのは${BNL[f.bottleneck]}（指数${f.bv}）だが平均超のため、現状維持＋監視でよい。</div>`:`<div class="insight warnb" style="margin-top:10px"><span class="h">BOTTLENECK</span><b>${BNL[f.bottleneck]}（指数${f.bv}）が最深。</b>${BOTTLE_TXT[f.bottleneck]}</div>`}
+  ${['f2','f3','f4'].some(k=>f[k]==null)?`<div class="insight"><span class="h">STATUS</span>未計測の段があるため、3段全体の強弱は評価できません。</div>`:f.weak===false?`<div class="insight" style="margin-top:10px"><span class="h">STATUS</span><b>3段とも8車種平均以上。</b>明確な弱点は無い。最も低いのは${BNL[f.bottleneck]}（指数${f.bv??'—'}）だが平均超のため、現状維持＋監視でよい。</div>`:`<div class="insight warnb" style="margin-top:10px"><span class="h">BOTTLENECK</span><b>${BNL[f.bottleneck]}（指数${f.bv??'—'}）が最深。</b>${BOTTLE_TXT[f.bottleneck]}</div>`}
   </div>
  </div>
  <div class="card pbcard"><h3>打ち手 — どこに何を置くか</h3><div class="sub">この車の実測から出した具体案。数字はすべて画面上の実測値が根拠。公式サイト内の施策と、AIが実際に引いている外部メディアへの施策を併記</div>
