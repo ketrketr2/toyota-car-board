@@ -395,12 +395,14 @@ for cid, cv in bd["cars"].items():
     # F1(回答生成率×平均引用数)は8車で97.3〜99.5% × 1.52〜1.96本とほぼ差が無く、
     # その車が何かをした結果ではなく“質問領域の性質”なので、弱点の候補に入れない。
     fs = {"F2": cv["f2i"], "F3": cv["f3i"], "F4": cv["f4i"]}
-    bott = min(fs, key=fs.get)
+    # 未計測の段をボトルネックの比較に含めない。
+    measured = {k: v for k, v in fs.items() if v is not None}
+    bott = min(measured, key=measured.get) if measured else None
     funnel.append({"id": cid, "name": cv["name"], "seg": cv["seg"], "f1": cv["f1i"], "f2": cv["f2i"],
                    "f3": cv["f3i"], "f4": cv["f4i"], "expi": cv["expi"], "katarare": cv["katarare"],
-                   "mr": cv["mr"], "fr": cv["fr"], "bottleneck": bott, "bv": fs[bott],
+                   "mr": cv["mr"], "fr": cv["fr"], "bottleneck": bott, "bv": measured.get(bott),
                    # 4段すべて平均以上なら「弱点」と呼ばない（赤リングを付けない）
-                   "weak": fs[bott] < 100,
+                   "weak": measured[bott] < 100 if bott is not None else False,
                    "ai_share": cv["ai_share"], "ga28": cv["ga28"], "sales_m": cv["sales_m"],
                    "sales_share": cv["sales_share"], "answered_rate": cv["answered_rate"],
                    "avg_cites": cv["avg_cites"], "target_cells": cv["target_cells"],

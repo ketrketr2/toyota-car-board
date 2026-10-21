@@ -54,6 +54,10 @@ jobs:
         if: steps.keys.outputs.ok == 'true'
         run: pip install pyyaml cryptography requests
 
+      - name: 集計の回帰テスト
+        if: steps.keys.outputs.ok == 'true'
+        run: python3 -m unittest discover -s tests -v
+
       - uses: actions/setup-node@v4
         if: steps.keys.outputs.ok == 'true'
         with:
