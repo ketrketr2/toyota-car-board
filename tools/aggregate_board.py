@@ -9,10 +9,12 @@ TOOLS = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, f'{GEO}/src')
 import yaml
 
-snaps = sorted(glob.glob(f'{GEO}/data/car/snapshots/*.json'))
-if not snaps:
+sys.path.insert(0, TOOLS)
+from snapshot_pick import pick_car_snapshot  # noqa: E402
+_snap_path, snap, _skipped = pick_car_snapshot(GEO)
+if not snap:
     sys.exit('car-round のスナップショットが見つかりません（計測がまだ回っていない可能性）')
-snap = json.load(open(snaps[-1]))
+print(f"car-round: {os.path.basename(_snap_path)} を使用" + (f"（車種クエリを含まない新しい回 {', '.join(_skipped)} は飛ばした）" if _skipped else ''), flush=True)
 
 # 計測時のカタログではなく“現行の”カタログで引き直す（誤検出修正・ブランド統合を遡及適用）
 sys.path.insert(0, TOOLS)

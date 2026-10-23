@@ -18,8 +18,12 @@ BD_PATH = os.environ.get("BOARD_DATA", "board_data.json")
 OUT = os.environ.get("SIGNAL_DATA", "signal_data.json")
 
 bd = json.load(open(BD_PATH, encoding="utf-8"))
-snap_path = sorted(glob.glob(os.path.join(GEO, "data", "car", "snapshots", "*.json")))[-1]
-snap = json.load(open(snap_path, encoding="utf-8"))
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from snapshot_pick import pick_car_snapshot  # noqa: E402
+snap_path, snap, _skipped = pick_car_snapshot(GEO)
+if not snap:
+    sys.exit("car-round のスナップショットが見つかりません")
+print(f"car-round: {os.path.basename(snap_path)} を使用" + (f"（車種クエリを含まない新しい回 {', '.join(_skipped)} は飛ばした）" if _skipped else ""))
 
 # 計測時のカタログではなく“現行の”カタログで引き直す（誤検出修正・ブランド統合を遡及適用）
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
