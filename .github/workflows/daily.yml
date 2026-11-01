@@ -27,7 +27,7 @@ concurrency:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04   # Playwright 1.5x は ubuntu 26.04 非対応（ubuntu-latest の 26.04 切替で失敗するため固定）
     timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
@@ -138,7 +138,7 @@ jobs:
 
   deploy:
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04   # Playwright 1.5x は ubuntu 26.04 非対応（ubuntu-latest の 26.04 切替で失敗するため固定）
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
